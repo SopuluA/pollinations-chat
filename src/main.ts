@@ -9,6 +9,7 @@ import { renderVars } from './ui/vars';
 import { updateHeaderBadge } from './ui/header';
 import { resetConfigTab } from './ui/config';
 import { initSidebarSearch } from './ui/search';
+import { TEMPLATES } from './nodes/templates';
 import type { FlowNode, Edge } from './types';
 
 interface SaveData {
@@ -165,6 +166,85 @@ if (configPanel) {
   });
   observer.observe(configPanel, { attributes: true, attributeFilter: ['class'] });
 }
+
+// ── Templates ─────────────────────────────────────────────────────────────────
+
+document.getElementById('btn-templates')?.addEventListener('click', () => {
+  // Build modal
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#000a;z-index:1000;display:flex;align-items:center;justify-content:center';
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:20px;width:480px;max-width:95vw;display:flex;flex-direction:column;gap:12px';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:0.9rem;font-weight:700;letter-spacing:0.5px;color:#e2e2e2;margin-bottom:4px';
+  title.textContent = 'Workflow Templates';
+  modal.appendChild(title);
+
+  TEMPLATES.forEach(tpl => {
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:12px 14px;border:1px solid #2a2a2a;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;background:#1c1c1c';
+    card.onmouseenter = () => { card.style.borderColor = '#5b8dee'; card.style.background = '#1a1a2a'; };
+    card.onmouseleave = () => { card.style.borderColor = '#2a2a2a'; card.style.background = '#1c1c1c'; };
+
+    const name = document.createElement('div');
+    name.style.cssText = 'font-size:0.82rem;font-weight:600;color:#e2e2e2;margin-bottom:3px';
+    name.textContent = tpl.name;
+
+    const desc = document.createElement('div');
+    desc.style.cssText = 'font-size:0.72rem;color:#5a5a5a';
+    desc.textContent = tpl.description;
+
+    card.append(name, desc);
+    card.addEventListener('click', () => {
+      // Clear canvas
+      document.querySelectorAll<HTMLElement>('.node').forEach(el => el.remove());
+      resetState();
+      const edgesG = document.getElementById('edges-g');
+      if (edgesG) edgesG.innerHTML = '';
+
+      // Assign IDs
+      let seq = 1;
+      const idMap: string[] = [];
+      tpl.nodes.forEach((n, i) => {
+        const id = 'n' + (seq++);
+        idMap[i] = id;
+        const node: FlowNode = { ...n, id };
+        nodes.push(node);
+        mountNode(node);
+      });
+      setIdSeq(seq);
+
+      // Create edges
+      tpl.edges.forEach(e => {
+        const from = idMap[e.from] ?? '';
+        const to   = idMap[e.to]   ?? '';
+        if (from && to) edges.push({ id: 'e' + (seq++), from, to });
+      });
+
+      const hint = document.getElementById('empty-hint');
+      if (hint) hint.style.display = 'none';
+
+      redrawEdges();
+      updateHeaderBadge();
+      addLog(null, `Loaded template: ${tpl.name}`, 'info');
+      document.body.removeChild(overlay);
+    });
+
+    modal.appendChild(card);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Cancel';
+  closeBtn.style.cssText = 'margin-top:4px;padding:7px;border:1px solid #2a2a2a;background:none;color:#5a5a5a;border-radius:7px;cursor:pointer;font-size:0.78rem';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+  modal.appendChild(closeBtn);
+
+  overlay.appendChild(modal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) document.body.removeChild(overlay); });
+  document.body.appendChild(overlay);
+});
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 
