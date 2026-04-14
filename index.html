@@ -3,341 +3,347 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flow — Agentic Automation</title>
+  <title>Flow — HTTP Automation</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0d0d0d;
-      --surface: #161616;
-      --surface2: #1e1e1e;
-      --border: #2a2a2a;
-      --text: #e8e8e8;
-      --muted: #666;
-      --accent: #7c6af7;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --surface3: #222;
+      --border: #272727;
+      --text: #e2e2e2;
+      --muted: #5a5a5a;
+      --accent: #5b8dee;
+      --green: #22c55e;
+      --red: #ef4444;
+      --orange: #f97316;
+      --yellow: #eab308;
+      --purple: #a855f7;
     }
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
     }
 
-    /* HEADER */
+    /* ── HEADER ── */
     header {
-      height: 48px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 12px;
-      flex-shrink: 0;
+      height: 46px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 14px; gap: 10px; flex-shrink: 0;
     }
-    header h1 { font-size: 0.95rem; font-weight: 800; letter-spacing: 2px; }
-    .badge { font-size: 0.62rem; padding: 2px 7px; background: var(--accent); border-radius: 4px; opacity: 0.85; font-weight: 600; letter-spacing: 0.5px; }
+    .logo { font-size: 0.88rem; font-weight: 800; letter-spacing: 2px; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .hdr-sep { width: 1px; height: 18px; background: var(--border); }
+    .hdr-label { font-size: 0.72rem; color: var(--muted); }
     .spacer { flex: 1; }
     .btn {
-      padding: 6px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 500;
-      transition: opacity 0.15s;
+      padding: 5px 13px; border-radius: 7px; border: none;
+      cursor: pointer; font-size: 0.78rem; font-weight: 500;
+      transition: opacity .15s; white-space: nowrap;
     }
-    .btn:hover { opacity: 0.8; }
+    .btn:hover:not(:disabled) { opacity: .78; }
+    .btn:disabled { opacity: .35; cursor: not-allowed; }
     .btn-primary { background: var(--accent); color: #fff; }
-    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-danger  { background: transparent; color: var(--red); border: 1px solid var(--red)33; }
+    .btn-sm { padding: 3px 9px; font-size: 0.72rem; }
 
-    /* MAIN LAYOUT */
+    /* ── LAYOUT ── */
     .main { flex: 1; display: flex; overflow: hidden; }
 
-    /* SIDEBAR */
+    /* ── SIDEBAR ── */
     .sidebar {
-      width: 196px;
-      border-right: 1px solid var(--border);
-      background: var(--surface);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      flex-shrink: 0;
+      width: 200px; border-right: 1px solid var(--border);
+      background: var(--surface); display: flex; flex-direction: column;
+      overflow-y: auto; flex-shrink: 0;
     }
-    .sidebar-section { padding: 14px 12px; }
-    .sidebar-title {
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--muted);
-      margin-bottom: 10px;
+    .sb-section { padding: 12px 10px; }
+    .sb-title {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--muted); margin-bottom: 8px; padding: 0 2px;
     }
     .palette-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      margin-bottom: 6px;
-      cursor: grab;
-      font-size: 0.82rem;
-      user-select: none;
-      transition: border-color 0.15s, background 0.15s;
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 9px; border-radius: 7px;
+      background: var(--surface2); border: 1px solid var(--border);
+      margin-bottom: 5px; cursor: grab; font-size: 0.8rem;
+      user-select: none; transition: border-color .15s, background .15s;
     }
-    .palette-item:hover { border-color: var(--accent); background: #1a1a2a; }
+    .palette-item:hover { border-color: var(--accent)66; background: var(--surface3); }
     .palette-item:active { cursor: grabbing; }
-    .palette-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .palette-desc { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+    .p-icon { font-size: 0.85rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .p-info { display: flex; flex-direction: column; gap: 1px; }
+    .p-name { font-size: 0.78rem; font-weight: 500; }
+    .p-desc { font-size: 0.65rem; color: var(--muted); }
 
-    /* CANVAS */
+    /* vars list */
+    .var-list { display: flex; flex-direction: column; gap: 4px; }
+    .var-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 7px; background: var(--surface2); border-radius: 6px;
+      border: 1px solid var(--border); font-size: 0.72rem;
+    }
+    .var-key { color: var(--accent); font-weight: 600; min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .var-val { color: var(--muted); min-width: 0; flex: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .var-empty { font-size: 0.72rem; color: var(--muted); padding: 4px 2px; }
+
+    /* ── CANVAS ── */
     .canvas-wrap {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
+      flex: 1; position: relative; overflow: hidden;
       background-color: var(--bg);
       background-image: radial-gradient(circle, #222 1px, transparent 1px);
       background-size: 22px 22px;
     }
     #canvas-svg {
-      position: absolute;
-      top: 0; left: 0;
+      position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 1;
+      pointer-events: none; z-index: 1;
     }
     .canvas-nodes {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 2;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; z-index: 2;
     }
 
-    /* NODES */
+    /* ── NODES ── */
     .node {
-      position: absolute;
-      width: 188px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      cursor: move;
-      user-select: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      position: absolute; width: 200px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; cursor: move; user-select: none;
+      transition: border-color .15s, box-shadow .15s;
     }
-    .node:hover { border-color: #3a3a3a; }
-    .node.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
+    .node:hover { border-color: #353535; }
+    .node.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent)22; }
     .node-header {
-      padding: 9px 12px;
-      border-radius: 12px 12px 0 0;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 0.78rem;
-      font-weight: 600;
+      padding: 8px 11px; border-radius: 10px 10px 0 0;
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.76rem; font-weight: 600;
       border-bottom: 1px solid var(--border);
     }
-    .node-icon { font-size: 0.88rem; }
-    .node-body {
-      padding: 8px 12px;
-      font-size: 0.73rem;
-      color: var(--muted);
-      min-height: 30px;
-      line-height: 1.5;
-      word-break: break-word;
+    .node-body { padding: 7px 11px; font-size: 0.7rem; color: var(--muted); min-height: 28px; line-height: 1.5; word-break: break-word; }
+    .method-badge {
+      font-size: 0.62rem; font-weight: 700; padding: 1px 5px;
+      border-radius: 4px; letter-spacing: 0.5px;
     }
+    .method-GET    { background: #22c55e22; color: #22c55e; }
+    .method-POST   { background: #f9731622; color: #f97316; }
+    .method-PUT    { background: #eab30822; color: #eab308; }
+    .method-DELETE { background: #ef444422; color: #ef4444; }
+    .method-PATCH  { background: #a855f722; color: #a855f7; }
 
-    /* PORTS */
+    /* STATUS CHIP on node */
+    .node-chip {
+      margin-left: auto; font-size: 0.6rem; font-weight: 700;
+      padding: 1px 5px; border-radius: 4px; letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    .chip-idle    { background: #2a2a2a; color: var(--muted); }
+    .chip-run     { background: #f59e0b22; color: #f59e0b; animation: blink .6s infinite; }
+    .chip-ok      { background: #22c55e22; color: #22c55e; }
+    .chip-err     { background: #ef444422; color: #ef4444; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+    /* ── PORTS ── */
     .port {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      border: 2px solid #3a3a3a;
-      background: var(--surface2);
-      position: absolute;
-      cursor: crosshair;
-      z-index: 10;
-      transition: border-color 0.15s, transform 0.15s, background 0.15s;
+      width: 13px; height: 13px; border-radius: 50%;
+      border: 2px solid #333; background: var(--surface2);
+      position: absolute; cursor: crosshair; z-index: 10;
+      transition: border-color .12s, transform .12s, background .12s;
     }
-    .port-in  { top: -8px;    left: 50%; transform: translateX(-50%); }
-    .port-out { bottom: -8px; left: 50%; transform: translateX(-50%); }
-    .port-in:hover  { border-color: #22c55e; background: #22c55e33; transform: translateX(-50%) scale(1.3); }
-    .port-out:hover { border-color: var(--accent); background: #7c6af733; transform: translateX(-50%) scale(1.3); }
-    .port.hot { border-color: var(--accent); background: var(--accent); }
+    .port-in  { top: -7px;    left: 50%; transform: translateX(-50%); }
+    .port-out { bottom: -7px; left: 50%; transform: translateX(-50%); }
+    .port-in:hover  { border-color: var(--green); background: var(--green)33; transform: translateX(-50%) scale(1.3); }
+    .port-out:hover { border-color: var(--accent); background: var(--accent)33; transform: translateX(-50%) scale(1.3); }
 
-    /* NODE STATUS DOT */
-    .node-status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: #333;
-      margin-left: auto;
-      flex-shrink: 0;
-      transition: background 0.2s;
-    }
-    .node-status-dot.running { background: #f59e0b; animation: blink .6s infinite; }
-    .node-status-dot.done    { background: #22c55e; }
-    .node-status-dot.error   { background: #ef4444; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-    /* CONFIG PANEL */
+    /* ── CONFIG PANEL ── */
     .config-panel {
-      width: 268px;
-      border-left: 1px solid var(--border);
-      background: var(--surface);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      flex-shrink: 0;
+      width: 280px; border-left: 1px solid var(--border);
+      background: var(--surface); display: flex; flex-direction: column;
+      overflow: hidden; flex-shrink: 0;
     }
     .config-panel.hidden { display: none; }
     .config-header {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.84rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
-    .config-close { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; line-height: 1; }
-    .config-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .config-header-title { font-size: 0.82rem; font-weight: 600; flex: 1; }
+    .icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 2px 4px; border-radius: 4px; }
+    .icon-btn:hover { color: var(--text); background: var(--surface2); }
+    .config-scroll { flex: 1; overflow-y: auto; }
+    .config-body { padding: 14px; display: flex; flex-direction: column; gap: 11px; }
+
+    /* fields */
     .field { display: flex; flex-direction: column; gap: 4px; }
-    .field label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+    .field > label { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
     .field input, .field textarea, .field select {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 10px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-family: inherit;
-      outline: none;
-      resize: vertical;
-      width: 100%;
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      padding: 7px 9px; border-radius: 7px; font-size: 0.79rem;
+      font-family: inherit; outline: none; resize: vertical; width: 100%;
     }
     .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
-    .field textarea { min-height: 60px; }
-    .hint-text { font-size: 0.71rem; color: var(--muted); line-height: 1.5; }
-    .delete-btn {
-      margin: 0 16px 14px;
-      padding: 8px;
-      border: 1px solid #ef4444;
-      color: #ef4444;
-      background: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: background 0.15s;
-    }
-    .delete-btn:hover { background: rgba(239,68,68,0.1); }
+    .field textarea { min-height: 56px; font-family: 'SF Mono','Fira Code',monospace; font-size: 0.74rem; }
+    .hint { font-size: 0.67rem; color: var(--muted); line-height: 1.55; }
 
-    /* LOG PANEL */
+    /* headers editor */
+    .kv-list { display: flex; flex-direction: column; gap: 5px; }
+    .kv-row { display: flex; gap: 5px; align-items: center; }
+    .kv-row input { flex: 1; padding: 5px 7px; font-size: 0.74rem; }
+    .kv-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 2px 4px; flex-shrink: 0; }
+    .kv-del:hover { color: var(--red); }
+    .add-row-btn {
+      background: none; border: 1px dashed var(--border); color: var(--muted);
+      border-radius: 6px; padding: 5px; font-size: 0.72rem; cursor: pointer; width: 100%;
+      transition: border-color .15s, color .15s;
+    }
+    .add-row-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* response preview in config */
+    .res-preview {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 8px 10px;
+      font-family: 'SF Mono','Fira Code',monospace; font-size: 0.7rem;
+      line-height: 1.55; max-height: 160px; overflow: auto;
+      color: var(--text); white-space: pre-wrap; word-break: break-all;
+    }
+    .res-meta { display: flex; gap: 8px; margin-bottom: 6px; }
+    .res-status { font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+    .res-status.ok  { background: var(--green)22; color: var(--green); }
+    .res-status.err { background: var(--red)22;   color: var(--red);   }
+    .res-time { font-size: 0.68rem; color: var(--muted); }
+
+    .config-footer { padding: 10px 14px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+    /* ── LOG PANEL ── */
     .log-panel {
-      height: 148px;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
+      height: 140px; border-top: 1px solid var(--border);
+      background: var(--surface); display: flex; flex-direction: column; flex-shrink: 0;
     }
     .log-header {
-      padding: 5px 14px;
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
+      padding: 4px 12px; font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
-    .log-clear { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.72rem; }
+    .log-header .spacer { flex: 1; }
     #log {
-      flex: 1;
-      overflow-y: auto;
-      padding: 6px 14px;
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.73rem;
-      line-height: 1.65;
+      flex: 1; overflow-y: auto; padding: 5px 12px;
+      font-family: 'SF Mono','Fira Code','Consolas',monospace;
+      font-size: 0.7rem; line-height: 1.65;
     }
-    .log-entry { display: flex; gap: 8px; }
-    .log-time { color: #444; flex-shrink: 0; }
-    .log-node { color: var(--accent); flex-shrink: 0; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .log-msg { word-break: break-all; }
-    .log-msg.error   { color: #ef4444; }
-    .log-msg.success { color: #22c55e; }
-    .log-msg.info    { color: var(--muted); }
+    .le { display: flex; gap: 8px; }
+    .le-time { color: #383838; flex-shrink: 0; }
+    .le-tag  { flex-shrink: 0; font-weight: 600; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .le-msg  { word-break: break-all; }
+    .le-msg.ok   { color: var(--green); }
+    .le-msg.err  { color: var(--red); }
+    .le-msg.info { color: var(--muted); }
+    .le-msg.warn { color: var(--yellow); }
 
-    /* EDGES */
-    .edge { stroke: #383838; stroke-width: 1.8; fill: none; cursor: pointer; pointer-events: stroke; transition: stroke 0.15s; }
-    .edge:hover { stroke: #ef4444; stroke-width: 2.5; }
-    #connecting-line { stroke: var(--accent); stroke-width: 1.8; fill: none; stroke-dasharray: 5,3; display: none; pointer-events: none; }
+    /* edges */
+    .edge { stroke: #303030; stroke-width: 1.6; fill: none; cursor: pointer; pointer-events: stroke; }
+    .edge:hover { stroke: var(--red); stroke-width: 2.2; }
+    #conn-line { stroke: var(--accent); stroke-width: 1.6; fill: none; stroke-dasharray: 5,3; display: none; pointer-events: none; }
 
-    /* EMPTY HINT */
+    /* empty state */
     .empty-hint {
-      position: absolute;
-      top: 50%; left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      text-align: center;
-      color: var(--muted);
-      pointer-events: none;
+      text-align: center; color: var(--muted); pointer-events: none;
     }
-    .empty-hint h2 { font-size: 1.05rem; margin-bottom: 6px; font-weight: 600; }
-    .empty-hint p { font-size: 0.78rem; line-height: 1.6; }
+    .empty-hint h2 { font-size: 1rem; margin-bottom: 6px; font-weight: 600; color: #404040; }
+    .empty-hint p { font-size: 0.75rem; line-height: 1.7; }
+
+    /* section divider */
+    .divider { height: 1px; background: var(--border); margin: 0; }
+
+    /* tab row */
+    .tab-row { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .tab {
+      padding: 7px 12px; font-size: 0.74rem; cursor: pointer;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 11px; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>FLOW</h1>
-  <span class="badge">agentic</span>
+  <div class="logo">FL<span>O</span>W</div>
+  <div class="hdr-sep"></div>
+  <span class="hdr-label">HTTP Automation</span>
   <div class="spacer"></div>
-  <button class="btn btn-ghost" id="btn-clear">Clear</button>
-  <button class="btn btn-ghost" id="btn-save">Save</button>
-  <button class="btn btn-ghost" id="btn-load">Load</button>
-  <button class="btn btn-primary" id="btn-run">&#9654; Run</button>
+  <button class="btn btn-ghost btn-sm" id="btn-clear">Clear</button>
+  <button class="btn btn-ghost btn-sm" id="btn-save">Save</button>
+  <button class="btn btn-ghost btn-sm" id="btn-load">Load</button>
+  <button class="btn btn-primary" id="btn-run">&#9654;&nbsp; Run</button>
 </header>
 
 <div class="main">
+
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-title">Nodes</div>
-
-      <div class="palette-item" draggable="true" data-type="trigger">
-        <div class="palette-dot" style="background:#22c55e"></div>
-        <div><div>Trigger</div><div class="palette-desc">Start the flow</div></div>
+    <div class="sb-section">
+      <div class="sb-title">HTTP</div>
+      <div class="palette-item" draggable="true" data-type="request">
+        <span class="p-icon">🌐</span>
+        <div class="p-info"><div class="p-name">HTTP Request</div><div class="p-desc">GET, POST, PUT, DELETE…</div></div>
       </div>
-      <div class="palette-item" draggable="true" data-type="ai">
-        <div class="palette-dot" style="background:#a855f7"></div>
-        <div><div>AI Agent</div><div class="palette-desc">Pollinations LLM</div></div>
+      <div class="palette-item" draggable="true" data-type="auth">
+        <span class="p-icon">🔑</span>
+        <div class="p-info"><div class="p-name">Auth</div><div class="p-desc">Bearer / API key / Basic</div></div>
       </div>
-      <div class="palette-item" draggable="true" data-type="http">
-        <div class="palette-dot" style="background:#3b82f6"></div>
-        <div><div>HTTP Request</div><div class="palette-desc">Fetch any URL</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="transform">
-        <div class="palette-dot" style="background:#f97316"></div>
-        <div><div>Transform</div><div class="palette-desc">Reshape data</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="condition">
-        <div class="palette-dot" style="background:#eab308"></div>
-        <div><div>Condition</div><div class="palette-desc">Branch on value</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="output">
-        <div class="palette-dot" style="background:#6b7280"></div>
-        <div><div>Output</div><div class="palette-desc">Display result</div></div>
+      <div class="palette-item" draggable="true" data-type="paginate">
+        <span class="p-icon">📄</span>
+        <div class="p-info"><div class="p-name">Paginate</div><div class="p-desc">Loop through pages</div></div>
       </div>
     </div>
 
-    <div class="sidebar-section" style="border-top:1px solid var(--border); margin-top: auto;">
-      <div class="sidebar-title">Usage</div>
-      <p class="hint-text">
-        Drag nodes to canvas.<br>
-        Click <b style="color:var(--text)">&#9679;</b> output port, then an input port to connect.<br>
-        Click an edge to delete it.<br>
-        <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 4px;border-radius:3px;font-size:0.68rem;">Del</kbd> removes selected node.
-      </p>
+    <div class="divider"></div>
+    <div class="sb-section">
+      <div class="sb-title">Data</div>
+      <div class="palette-item" draggable="true" data-type="trigger">
+        <span class="p-icon">⚡</span>
+        <div class="p-info"><div class="p-name">Trigger</div><div class="p-desc">Manual start / input</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="extract">
+        <span class="p-icon">🔍</span>
+        <div class="p-info"><div class="p-name">Extract</div><div class="p-desc">Pick JSON field by path</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="transform">
+        <span class="p-icon">⚙</span>
+        <div class="p-info"><div class="p-name">Transform</div><div class="p-desc">Template / JS reshape</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="set_var">
+        <span class="p-icon">📌</span>
+        <div class="p-info"><div class="p-name">Set Variable</div><div class="p-desc">Store for reuse</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="condition">
+        <span class="p-icon">🔀</span>
+        <div class="p-info"><div class="p-name">Condition</div><div class="p-desc">Branch on value / status</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sb-section">
+      <div class="sb-title">Output</div>
+      <div class="palette-item" draggable="true" data-type="ai">
+        <span class="p-icon">🤖</span>
+        <div class="p-info"><div class="p-name">AI Process</div><div class="p-desc">Summarize / analyze</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="output">
+        <span class="p-icon">📤</span>
+        <div class="p-info"><div class="p-name">Output</div><div class="p-desc">Display final result</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sb-section" style="margin-top:auto">
+      <div class="sb-title">Variables</div>
+      <div class="var-list" id="var-list">
+        <div class="var-empty">No variables set yet.</div>
+      </div>
     </div>
   </div>
 
@@ -346,19 +352,17 @@
     <svg id="canvas-svg">
       <defs>
         <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L0,7 L7,3.5 z" fill="#383838"/>
-        </marker>
-        <marker id="arr-hot" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L0,7 L7,3.5 z" fill="#7c6af7"/>
+          <path d="M0,0 L0,7 L7,3.5 z" fill="#303030"/>
         </marker>
       </defs>
       <g id="edges-g"></g>
-      <path id="connecting-line" d=""/>
+      <path id="conn-line" d=""/>
     </svg>
     <div class="canvas-nodes" id="canvas-nodes">
       <div class="empty-hint" id="empty-hint">
-        <h2>Build a workflow</h2>
-        <p>Drag a <strong>Trigger</strong> node onto the canvas<br>then chain AI agents, transforms, and outputs.</p>
+        <h2>Drop nodes to start</h2>
+        <p>Drag an <strong>HTTP Request</strong> or <strong>Trigger</strong> node<br>
+        onto the canvas, wire nodes together, hit <strong>Run</strong>.</p>
       </div>
     </div>
   </div>
@@ -366,19 +370,25 @@
   <!-- Config panel -->
   <div class="config-panel hidden" id="config-panel">
     <div class="config-header">
-      <span id="config-title">Configure</span>
-      <button class="config-close" id="config-close">&#10005;</button>
+      <span id="config-title" class="config-header-title">Configure</span>
+      <button class="icon-btn" id="config-close">✕</button>
     </div>
-    <div class="config-body" id="config-body"></div>
-    <button class="delete-btn" id="config-delete">Delete node</button>
+    <div class="config-scroll">
+      <div class="config-body" id="config-body"></div>
+    </div>
+    <div class="config-footer">
+      <button class="btn btn-danger btn-sm" id="config-delete" style="width:100%">Delete node</button>
+    </div>
   </div>
+
 </div>
 
-<!-- Log panel -->
+<!-- Log -->
 <div class="log-panel">
   <div class="log-header">
-    <span>Execution Log</span>
-    <button class="log-clear" id="log-clear">Clear</button>
+    <span>Log</span>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="log-clear" style="font-size:0.7rem">Clear</button>
   </div>
   <div id="log"></div>
 </div>
@@ -387,74 +397,90 @@
 const REFERRER = 'pollinations-chat-kohl.vercel.app';
 
 // ─── State ──────────────────────────────────────────────────────────────────
-let nodes = [];
-let edges = [];
-let selected = null;
-let connecting = null;  // { nodeId, x, y }
-let dragging  = null;   // { nodeId, offX, offY }
-let running   = false;
-let idSeq     = 1;
+let nodes = [], edges = [], vars = {};
+let selected = null, connecting = null, dragging = null, running = false;
+let idSeq = 1;
+// per-node last response cache (for config panel preview)
+const nodeResponses = {};
 
 const NODE_DEF = {
-  trigger:   { label: 'Trigger',      icon: '⚡', color: '#22c55e', hasIn: false, hasOut: true  },
-  ai:        { label: 'AI Agent',     icon: '🤖', color: '#a855f7', hasIn: true,  hasOut: true  },
-  http:      { label: 'HTTP Request', icon: '🌐', color: '#3b82f6', hasIn: true,  hasOut: true  },
-  transform: { label: 'Transform',    icon: '⚙',  color: '#f97316', hasIn: true,  hasOut: true  },
-  condition: { label: 'Condition',    icon: '🔀', color: '#eab308', hasIn: true,  hasOut: true  },
-  output:    { label: 'Output',       icon: '📤', color: '#6b7280', hasIn: true,  hasOut: false },
+  trigger:   { label: 'Trigger',       icon: '⚡', color: '#5b8dee', hasIn: false, hasOut: true },
+  request:   { label: 'HTTP Request',  icon: '🌐', color: '#22c55e', hasIn: true,  hasOut: true },
+  auth:      { label: 'Auth',          icon: '🔑', color: '#eab308', hasIn: true,  hasOut: true },
+  paginate:  { label: 'Paginate',      icon: '📄', color: '#f97316', hasIn: true,  hasOut: true },
+  extract:   { label: 'Extract',       icon: '🔍', color: '#3b82f6', hasIn: true,  hasOut: true },
+  transform: { label: 'Transform',     icon: '⚙',  color: '#f97316', hasIn: true,  hasOut: true },
+  set_var:   { label: 'Set Variable',  icon: '📌', color: '#a855f7', hasIn: true,  hasOut: true },
+  condition: { label: 'Condition',     icon: '🔀', color: '#eab308', hasIn: true,  hasOut: true },
+  ai:        { label: 'AI Process',    icon: '🤖', color: '#a855f7', hasIn: true,  hasOut: true },
+  output:    { label: 'Output',        icon: '📤', color: '#6b7280', hasIn: true,  hasOut: false },
 };
 
 const DEFAULTS = {
-  trigger:   { prompt: 'Hello! What can you help me with today?' },
-  ai:        { system: 'You are a helpful assistant. Be concise.', prompt: '{{input}}' },
-  http:      { url: 'https://httpbin.org/get', method: 'GET', body: '' },
+  trigger:   { input: '' },
+  request:   { method: 'GET', url: '', headers: [], body: '', auth_type: 'none', auth_value: '' },
+  auth:      { type: 'bearer', value: '' },
+  paginate:  { page_param: 'page', start: 1, max_pages: 5 },
+  extract:   { path: '', save_as: '' },
   transform: { template: '{{input}}' },
-  condition: { contains: '' },
-  output:    { label: 'Result' },
+  set_var:   { name: '', value: '{{input}}' },
+  condition: { field: 'status', op: 'eq', val: '200' },
+  ai:        { system: 'You are a helpful assistant. Be concise.', prompt: 'Summarize this data:\n\n{{input}}' },
+  output:    { label: 'Result', format: 'auto' },
 };
 
 // ─── DOM ────────────────────────────────────────────────────────────────────
-const canvas      = document.getElementById('canvas');
-const canvasNodes = document.getElementById('canvas-nodes');
-const edgesG      = document.getElementById('edges-g');
-const connectLine = document.getElementById('connecting-line');
-const configPanel = document.getElementById('config-panel');
-const configTitle = document.getElementById('config-title');
-const configBody  = document.getElementById('config-body');
-const emptyHint   = document.getElementById('empty-hint');
-const logEl       = document.getElementById('log');
-const btnRun      = document.getElementById('btn-run');
+const canvas       = document.getElementById('canvas');
+const canvasNodes  = document.getElementById('canvas-nodes');
+const edgesG       = document.getElementById('edges-g');
+const connLine     = document.getElementById('conn-line');
+const configPanel  = document.getElementById('config-panel');
+const configTitle  = document.getElementById('config-title');
+const configBody   = document.getElementById('config-body');
+const emptyHint    = document.getElementById('empty-hint');
+const logEl        = document.getElementById('log');
+const btnRun       = document.getElementById('btn-run');
+const varList      = document.getElementById('var-list');
 
-// ─── Log ────────────────────────────────────────────────────────────────────
-function addLog(nodeId, msg, type = '') {
+// ─── Log ─────────────────────────────────────────────────────────────────────
+function lg(tag, msg, type = '') {
   const d = document.createElement('div');
-  d.className = 'log-entry';
+  d.className = 'le';
   const t = new Date().toLocaleTimeString('en-US', { hour12: false });
-  const name = nodeId ? (nodes.find(n => n.id === nodeId)?.label || nodeId) : 'system';
-  d.innerHTML = `<span class="log-time">${t}</span><span class="log-node">[${name}]</span><span class="log-msg ${type}">${escHtml(String(msg))}</span>`;
+  const name = tag ? (nodes.find(n => n.id === tag)?.label || tag) : '—';
+  d.innerHTML = `<span class="le-time">${t}</span><span class="le-tag" style="color:${tag ? getTagColor(tag) : 'var(--muted)'}">${esc(name)}</span><span class="le-msg ${type}">${esc(String(msg))}</span>`;
   logEl.appendChild(d);
   logEl.scrollTop = logEl.scrollHeight;
 }
+function getTagColor(nodeId) {
+  const node = nodes.find(n => n.id === nodeId);
+  return node ? NODE_DEF[node.type]?.color || 'var(--muted)' : 'var(--muted)';
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// ─── Variables ───────────────────────────────────────────────────────────────
+function setVar(k, v) {
+  vars[k] = v;
+  renderVars();
+}
+function renderVars() {
+  const keys = Object.keys(vars);
+  if (!keys.length) { varList.innerHTML = '<div class="var-empty">No variables set yet.</div>'; return; }
+  varList.innerHTML = keys.map(k =>
+    `<div class="var-item"><span class="var-key">{{${esc(k)}}}</span><span class="var-val">${esc(String(vars[k]).slice(0,30))}</span></div>`
+  ).join('');
+}
+function resolveVars(s) {
+  return String(s).replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? '{{'+k+'}}');
 }
 
-// ─── Node rendering ──────────────────────────────────────────────────────────
+// ─── Node ────────────────────────────────────────────────────────────────────
 function createNode(type, x, y) {
   const id = 'n' + (idSeq++);
-  const node = {
-    id, type,
-    x: Math.round(Math.max(0, x)),
-    y: Math.round(Math.max(0, y)),
-    label: NODE_DEF[type].label,
-    config: JSON.parse(JSON.stringify(DEFAULTS[type])),
-    status: '',
-  };
+  const node = { id, type, x: Math.round(Math.max(0,x)), y: Math.round(Math.max(0,y)), label: NODE_DEF[type].label, config: JSON.parse(JSON.stringify(DEFAULTS[type])) };
   nodes.push(node);
   mountNode(node);
-  showEmptyHint();
-  return node;
+  showEmpty();
 }
 
 function mountNode(node) {
@@ -467,83 +493,79 @@ function mountNode(node) {
 
   el.innerHTML = `
     ${def.hasIn  ? `<div class="port port-in"  data-nid="${node.id}" data-dir="in"></div>`  : ''}
-    <div class="node-header" style="background:${def.color}16;border-bottom-color:${def.color}2a">
-      <span class="node-icon">${def.icon}</span>
-      <span class="node-label">${escHtml(node.label)}</span>
-      <div class="node-status-dot" id="nsd-${node.id}"></div>
+    <div class="node-header" style="background:${def.color}12;border-bottom-color:${def.color}28">
+      <span>${def.icon}</span>
+      <span class="node-lbl">${esc(node.label)}</span>
+      ${node.type === 'request' ? `<span class="method-badge method-${(node.config.method||'GET')}" id="mbadge-${node.id}">${esc(node.config.method||'GET')}</span>` : ''}
+      <span class="node-chip chip-idle" id="chip-${node.id}">idle</span>
     </div>
-    <div class="node-body" id="nbody-${node.id}">${escHtml(nodePreview(node))}</div>
+    <div class="node-body" id="nbody-${node.id}">${esc(preview(node))}</div>
     ${def.hasOut ? `<div class="port port-out" data-nid="${node.id}" data-dir="out"></div>` : ''}
   `;
 
-  // Drag node
   el.addEventListener('mousedown', e => {
     if (e.target.classList.contains('port')) return;
-    e.preventDefault();
-    selectNode(node.id);
+    e.preventDefault(); selectNode(node.id);
     const nr = el.getBoundingClientRect();
     dragging = { nodeId: node.id, offX: e.clientX - nr.left, offY: e.clientY - nr.top };
   });
 
-  // Ports
   el.querySelectorAll('.port').forEach(p => {
     p.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (p.dataset.dir === 'out') beginConnect(node.id, e);
-      else if (connecting && p.dataset.dir === 'in') endConnect(node.id);
+      e.stopPropagation(); e.preventDefault();
+      if (p.dataset.dir === 'out') beginConn(node.id, e);
+      else if (connecting && p.dataset.dir === 'in') endConn(node.id);
     });
   });
 
   canvasNodes.appendChild(el);
 }
 
-function nodePreview(node) {
+function preview(node) {
+  const c = node.config;
   switch (node.type) {
-    case 'trigger':   return node.config.prompt.slice(0, 70);
-    case 'ai':        return node.config.prompt.slice(0, 70);
-    case 'http':      return `${node.config.method} ${node.config.url.replace(/^https?:\/\//,'').slice(0, 44)}`;
-    case 'transform': return node.config.template.slice(0, 70);
-    case 'condition': return node.config.contains ? `contains: "${node.config.contains}"` : '(no condition)';
-    case 'output':    return node.config.label;
+    case 'trigger':   return c.input ? c.input.slice(0,60) : '(manual trigger)';
+    case 'request':   return `${c.method||'GET'} ${(c.url||'').replace(/^https?:\/\//,'').slice(0,50) || '(no url)'}`;
+    case 'auth':      return `${c.type === 'bearer' ? 'Bearer' : c.type === 'basic' ? 'Basic' : 'API Key'} — ${c.value ? '••••' : '(empty)'}`;
+    case 'paginate':  return `${c.page_param}=1…${c.max_pages}`;
+    case 'extract':   return c.path ? `→ ${c.path}${c.save_as ? ` → {{${c.save_as}}}` : ''}` : '(no path)';
+    case 'transform': return c.template.slice(0,60);
+    case 'set_var':   return c.name ? `{{${c.name}}} = ${c.value.slice(0,30)}` : '(no name)';
+    case 'condition': return `${c.field} ${c.op} ${c.val}`;
+    case 'ai':        return c.prompt.slice(0,60);
+    case 'output':    return c.label || 'Result';
     default: return '';
   }
 }
 
-function refreshNodeBody(nodeId) {
-  const node = nodes.find(n => n.id === nodeId);
-  const el = document.getElementById('nbody-' + nodeId);
-  if (node && el) el.textContent = nodePreview(node);
+function refreshBody(id) {
+  const node = nodes.find(n => n.id === id);
+  const el = document.getElementById('nbody-' + id);
+  if (node && el) el.textContent = preview(node);
+  const mb = document.getElementById('mbadge-' + id);
+  if (mb && node) { mb.textContent = node.config.method || 'GET'; mb.className = `method-badge method-${node.config.method||'GET'}`; }
 }
 
-function setNodeStatus(nodeId, s) {
-  const el = document.getElementById('nsd-' + nodeId);
-  if (el) el.className = 'node-status-dot ' + s;
+function chip(id, state, text) {
+  const el = document.getElementById('chip-' + id);
+  if (el) { el.className = `node-chip chip-${state}`; el.textContent = text; }
 }
 
 // ─── Selection ───────────────────────────────────────────────────────────────
 function selectNode(id) {
   document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
   selected = id;
-  if (id) {
-    document.getElementById('node-' + id)?.classList.add('selected');
-    openConfig(id);
-  }
+  if (id) { document.getElementById('node-'+id)?.classList.add('selected'); openConfig(id); }
 }
-
-function deselect() {
-  selectNode(null);
-  configPanel.classList.add('hidden');
-}
+function deselect() { selectNode(null); configPanel.classList.add('hidden'); }
 
 canvas.addEventListener('mousedown', e => {
-  if (e.target === canvas || e.target === canvasNodes || e.target === emptyHint || e.target.closest('.empty-hint')) {
-    deselect();
-    if (connecting) cancelConnect();
+  if (e.target === canvas || e.target.classList.contains('canvas-nodes') || e.target.closest('.empty-hint')) {
+    deselect(); if (connecting) cancelConn();
   }
 });
 
-// ─── Mouse move / up ─────────────────────────────────────────────────────────
+// ─── Drag ────────────────────────────────────────────────────────────────────
 document.addEventListener('mousemove', e => {
   if (dragging) {
     const cr = canvas.getBoundingClientRect();
@@ -557,289 +579,448 @@ document.addEventListener('mousemove', e => {
   }
   if (connecting) {
     const cr = canvas.getBoundingClientRect();
-    const mx = e.clientX - cr.left;
-    const my = e.clientY - cr.top;
-    connectLine.setAttribute('d', curve(connecting.x, connecting.y, mx, my));
+    connLine.setAttribute('d', bezier(connecting.x, connecting.y, e.clientX - cr.left, e.clientY - cr.top));
   }
 });
-
 document.addEventListener('mouseup', () => { dragging = null; });
 
-// ─── Connect ──────────────────────────────────────────────────────────────────
-function portCenter(nodeId, dir) {
+// ─── Connections ─────────────────────────────────────────────────────────────
+function portXY(nodeId, dir) {
   const el = document.getElementById('node-' + nodeId);
-  if (!el) return { x: 0, y: 0 };
-  const port = el.querySelector('.port-' + dir);
-  if (!port) return { x: 0, y: 0 };
-  const pr = port.getBoundingClientRect();
-  const cr = canvas.getBoundingClientRect();
-  return { x: pr.left + pr.width / 2 - cr.left, y: pr.top + pr.height / 2 - cr.top };
+  if (!el) return {x:0,y:0};
+  const p = el.querySelector('.port-' + dir);
+  if (!p) return {x:0,y:0};
+  const pr = p.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+  return { x: pr.left + pr.width/2 - cr.left, y: pr.top + pr.height/2 - cr.top };
 }
+function bezier(x1,y1,x2,y2) { const cy=(y1+y2)/2; return `M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}`; }
 
-function beginConnect(nodeId, e) {
-  const pos = portCenter(nodeId, 'out');
+function beginConn(nodeId, e) {
+  const pos = portXY(nodeId, 'out');
   connecting = { nodeId, x: pos.x, y: pos.y };
-  connectLine.style.display = '';
-  connectLine.setAttribute('d', `M${pos.x},${pos.y}`);
+  connLine.style.display = '';
+  connLine.setAttribute('d', `M${pos.x},${pos.y}`);
 }
-
-function endConnect(toNodeId) {
+function endConn(toId) {
   if (!connecting) return;
-  const { nodeId: from } = connecting;
-  cancelConnect();
-  if (from === toNodeId) return;
-  if (edges.find(e => e.from === from && e.to === toNodeId)) return;
-  edges.push({ id: 'e' + (idSeq++), from, to: toNodeId });
+  const from = connecting.nodeId;
+  cancelConn();
+  if (from === toId || edges.find(e => e.from === from && e.to === toId)) return;
+  edges.push({ id: 'e'+(idSeq++), from, to: toId });
   redrawEdges();
-  addLog(null, `Connected ${nodes.find(n=>n.id===from)?.label} → ${nodes.find(n=>n.id===toNodeId)?.label}`, 'info');
 }
-
-function cancelConnect() {
-  connecting = null;
-  connectLine.style.display = 'none';
-  connectLine.setAttribute('d', '');
-}
-
-// ─── Edges ───────────────────────────────────────────────────────────────────
-function curve(x1, y1, x2, y2) {
-  const cy = (y1 + y2) / 2;
-  return `M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}`;
-}
+function cancelConn() { connecting = null; connLine.style.display = 'none'; connLine.setAttribute('d',''); }
 
 function redrawEdges() {
   edgesG.innerHTML = '';
   for (const edge of edges) {
-    const a = portCenter(edge.from, 'out');
-    const b = portCenter(edge.to,   'in');
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('class', 'edge');
-    path.setAttribute('d', curve(a.x, a.y, b.x, b.y));
-    path.setAttribute('marker-end', 'url(#arr)');
+    const a = portXY(edge.from, 'out'), b = portXY(edge.to, 'in');
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('class','edge');
+    path.setAttribute('d', bezier(a.x,a.y,b.x,b.y));
+    path.setAttribute('marker-end','url(#arr)');
     path.addEventListener('click', () => { edges = edges.filter(e => e.id !== edge.id); redrawEdges(); });
     edgesG.appendChild(path);
   }
 }
 
-// ─── Sidebar drag-drop ────────────────────────────────────────────────────────
-let paletteDragType = null;
+// ─── Drag-drop from sidebar ──────────────────────────────────────────────────
+let pType = null;
 document.querySelectorAll('.palette-item').forEach(item => {
-  item.addEventListener('dragstart', e => {
-    paletteDragType = item.dataset.type;
-    e.dataTransfer.effectAllowed = 'copy';
-  });
+  item.addEventListener('dragstart', e => { pType = item.dataset.type; e.dataTransfer.effectAllowed = 'copy'; });
 });
 canvas.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
 canvas.addEventListener('drop', e => {
-  e.preventDefault();
-  if (!paletteDragType) return;
+  e.preventDefault(); if (!pType) return;
   const cr = canvas.getBoundingClientRect();
-  createNode(paletteDragType, e.clientX - cr.left - 94, e.clientY - cr.top - 44);
-  paletteDragType = null;
+  createNode(pType, e.clientX - cr.left - 100, e.clientY - cr.top - 44);
+  pType = null;
 });
 
-// ─── Config Panel ─────────────────────────────────────────────────────────────
+// ─── Config panel ────────────────────────────────────────────────────────────
 function openConfig(nodeId) {
   const node = nodes.find(n => n.id === nodeId);
   if (!node) return;
   const def = NODE_DEF[node.type];
-  configTitle.textContent = def.icon + '  ' + def.label;
+  configTitle.textContent = `${def.icon} ${def.label}`;
   configPanel.classList.remove('hidden');
-  configBody.innerHTML = '';
+  buildConfig(node);
+}
 
-  field('Label', 'text', node.label, v => {
+function buildConfig(node) {
+  configBody.innerHTML = '';
+  const c = node.config;
+
+  // label always
+  addField('Label', 'text', node.label, v => {
     node.label = v;
-    const lel = document.querySelector(`#node-${nodeId} .node-label`);
-    if (lel) lel.textContent = v;
+    const el = document.querySelector(`#node-${node.id} .node-lbl`); if (el) el.textContent = v;
   });
 
   if (node.type === 'trigger') {
-    field('Input text', 'textarea', node.config.prompt, v => { node.config.prompt = v; refreshNodeBody(nodeId); });
+    addField('Input text (optional)', 'textarea', c.input, v => { c.input = v; refreshBody(node.id); });
+    addHint('Leave blank for a manual button trigger. Use {{varName}} to inject variables.');
   }
-  if (node.type === 'ai') {
-    field('System prompt', 'textarea', node.config.system, v => { node.config.system = v; });
-    field('User prompt ({{input}} = upstream)', 'textarea', node.config.prompt, v => { node.config.prompt = v; refreshNodeBody(nodeId); });
+
+  if (node.type === 'request') {
+    // Method + URL on same line
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:flex-end';
+    const methodWrap = document.createElement('div'); methodWrap.className = 'field'; methodWrap.style.width = '90px';
+    const ml = document.createElement('label'); ml.textContent = 'Method';
+    const ms = document.createElement('select');
+    ['GET','POST','PUT','PATCH','DELETE','HEAD'].forEach(m => {
+      const o = document.createElement('option'); o.value = m; o.textContent = m; if (c.method===m) o.selected=true; ms.appendChild(o);
+    });
+    ms.addEventListener('change', () => { c.method = ms.value; refreshBody(node.id); });
+    methodWrap.append(ml, ms); row.appendChild(methodWrap);
+    const urlWrap = document.createElement('div'); urlWrap.className = 'field'; urlWrap.style.flex = '1';
+    const ul = document.createElement('label'); ul.textContent = 'URL';
+    const ui = document.createElement('input'); ui.type = 'text'; ui.value = c.url || ''; ui.placeholder = 'https://api.example.com/data';
+    ui.addEventListener('input', () => { c.url = ui.value; refreshBody(node.id); });
+    urlWrap.append(ul, ui); row.appendChild(urlWrap);
+    configBody.appendChild(row);
+
+    // Headers
+    addKVSection('Headers', c.headers ??= [], node.id);
+
+    // Auth
+    addSelectField('Auth type', ['none','bearer','api_key','basic'], c.auth_type||'none', v => { c.auth_type = v; refreshBody(node.id); buildConfig(node); });
+    if (c.auth_type === 'bearer') addField('Bearer token (or {{var}})', 'text', c.auth_value||'', v => { c.auth_value = v; });
+    if (c.auth_type === 'api_key') {
+      addField('Header name', 'text', c.auth_key||'X-API-Key', v => { c.auth_key = v; });
+      addField('Key value (or {{var}})', 'text', c.auth_value||'', v => { c.auth_value = v; });
+    }
+    if (c.auth_type === 'basic') addField('user:pass (or {{var}})', 'text', c.auth_value||'', v => { c.auth_value = v; });
+
+    // Body
+    if (['POST','PUT','PATCH'].includes(c.method||'GET')) {
+      addField('Body (JSON — use {{input}} or {{var}})', 'textarea', c.body||'', v => { c.body = v; });
+    }
+
+    // Response preview
+    if (nodeResponses[node.id]) showResponsePreview(nodeResponses[node.id]);
   }
-  if (node.type === 'http') {
-    field('URL', 'text', node.config.url, v => { node.config.url = v; refreshNodeBody(nodeId); });
-    selectField('Method', ['GET','POST','PUT','DELETE'], node.config.method, v => { node.config.method = v; refreshNodeBody(nodeId); });
-    field('Body (JSON, for POST/PUT)', 'textarea', node.config.body, v => { node.config.body = v; });
+
+  if (node.type === 'auth') {
+    addSelectField('Auth type', ['bearer','api_key','basic'], c.type||'bearer', v => { c.type = v; refreshBody(node.id); });
+    addField('Value (token / key / user:pass)', 'text', c.value||'', v => { c.value = v; refreshBody(node.id); });
+    addHint('This node injects auth into the next HTTP Request automatically.');
   }
+
+  if (node.type === 'paginate') {
+    addField('Page query param', 'text', c.page_param||'page', v => { c.page_param = v; refreshBody(node.id); });
+    addField('Start page', 'number', c.start??1, v => { c.start = +v; refreshBody(node.id); });
+    addField('Max pages', 'number', c.max_pages??5, v => { c.max_pages = +v; refreshBody(node.id); });
+    addHint('Repeats the upstream HTTP Request for each page and concatenates results.');
+  }
+
+  if (node.type === 'extract') {
+    addField('JSON path (e.g. data.items[0].name)', 'text', c.path||'', v => { c.path = v; refreshBody(node.id); });
+    addField('Save to variable (optional)', 'text', c.save_as||'', v => { c.save_as = v; refreshBody(node.id); });
+    addHint('Dot-notation path into the upstream JSON. Use [n] for array index, or [*] to map all items.');
+  }
+
   if (node.type === 'transform') {
-    const hint = document.createElement('p');
-    hint.className = 'hint-text';
-    hint.textContent = 'Use {{input}} for upstream text. Or write a JS function body using `input` variable.';
-    configBody.appendChild(hint);
-    field('Template / JS', 'textarea', node.config.template, v => { node.config.template = v; refreshNodeBody(nodeId); });
+    addField('Template / JS ({{input}} = upstream text)', 'textarea', c.template||'', v => { c.template = v; refreshBody(node.id); });
+    addHint('Pure template: use {{input}} and {{varName}}.\nJS mode: start with `return` to write a function body using `input` (string) and `vars` object.');
   }
+
+  if (node.type === 'set_var') {
+    addField('Variable name', 'text', c.name||'', v => { c.name = v; refreshBody(node.id); });
+    addField('Value ({{input}} or literal)', 'text', c.value||'{{input}}', v => { c.value = v; refreshBody(node.id); });
+    addHint('Use {{varName}} anywhere in subsequent nodes to reference this value.');
+  }
+
   if (node.type === 'condition') {
-    const hint = document.createElement('p');
-    hint.className = 'hint-text';
-    hint.textContent = 'If input contains this text, passes to next node. Otherwise skips.';
-    configBody.appendChild(hint);
-    field('Contains text', 'text', node.config.contains, v => { node.config.contains = v; refreshNodeBody(nodeId); });
+    addSelectField('Check field', ['status','body','header'], c.field||'status', v => { c.field = v; refreshBody(node.id); });
+    addSelectField('Operator', ['eq','neq','gt','lt','contains','starts_with'], c.op||'eq', v => { c.op = v; refreshBody(node.id); });
+    addField('Value to compare', 'text', c.val||'', v => { c.val = v; refreshBody(node.id); });
+    if (c.field === 'header') addField('Header name', 'text', c.header_name||'', v => { c.header_name = v; });
+    addHint('If condition is not met, node passes null downstream (stops the chain).');
   }
+
+  if (node.type === 'ai') {
+    addField('System prompt', 'textarea', c.system||'', v => { c.system = v; });
+    addField('User message ({{input}} = upstream)', 'textarea', c.prompt||'', v => { c.prompt = v; refreshBody(node.id); });
+    addHint('Powered by Pollinations AI (free, no key required).');
+  }
+
   if (node.type === 'output') {
-    field('Display label', 'text', node.config.label, v => { node.config.label = v; refreshNodeBody(nodeId); });
+    addField('Label', 'text', c.label||'Result', v => { c.label = v; refreshBody(node.id); });
+    addSelectField('Format', ['auto','json','text'], c.format||'auto', v => { c.format = v; });
   }
 }
 
-function field(labelText, type, val, onChange) {
-  const wrap = document.createElement('div');
-  wrap.className = 'field';
-  const lbl = document.createElement('label');
-  lbl.textContent = labelText;
+function addField(lbl, type, val, onChange) {
+  const wrap = document.createElement('div'); wrap.className = 'field';
+  const l = document.createElement('label'); l.textContent = lbl;
   const inp = document.createElement(type === 'textarea' ? 'textarea' : 'input');
   if (type !== 'textarea') inp.type = type;
   inp.value = val ?? '';
   if (type === 'textarea') inp.rows = 3;
   inp.addEventListener('input', () => onChange(inp.value));
-  wrap.append(lbl, inp);
-  configBody.appendChild(wrap);
+  wrap.append(l, inp); configBody.appendChild(wrap);
 }
 
-function selectField(labelText, options, current, onChange) {
-  const wrap = document.createElement('div');
-  wrap.className = 'field';
-  const lbl = document.createElement('label');
-  lbl.textContent = labelText;
+function addSelectField(lbl, options, current, onChange) {
+  const wrap = document.createElement('div'); wrap.className = 'field';
+  const l = document.createElement('label'); l.textContent = lbl;
   const sel = document.createElement('select');
-  options.forEach(o => {
-    const opt = document.createElement('option');
-    opt.value = o; opt.textContent = o;
-    if (o === current) opt.selected = true;
-    sel.appendChild(opt);
-  });
+  options.forEach(o => { const opt = document.createElement('option'); opt.value=o; opt.textContent=o; if(o===current) opt.selected=true; sel.appendChild(opt); });
   sel.addEventListener('change', () => onChange(sel.value));
-  wrap.append(lbl, sel);
-  configBody.appendChild(wrap);
+  wrap.append(l, sel); configBody.appendChild(wrap);
+}
+
+function addHint(txt) {
+  const p = document.createElement('p'); p.className = 'hint'; p.textContent = txt; configBody.appendChild(p);
+}
+
+function addKVSection(title, arr, nodeId) {
+  const wrap = document.createElement('div'); wrap.className = 'field';
+  const l = document.createElement('label'); l.textContent = title;
+  const list = document.createElement('div'); list.className = 'kv-list';
+
+  const renderRows = () => {
+    list.innerHTML = '';
+    arr.forEach((row, i) => {
+      const r = document.createElement('div'); r.className = 'kv-row';
+      const ki = document.createElement('input'); ki.placeholder = 'Key'; ki.value = row.k||''; ki.addEventListener('input', () => { arr[i].k = ki.value; });
+      const vi = document.createElement('input'); vi.placeholder = 'Value'; vi.value = row.v||''; vi.addEventListener('input', () => { arr[i].v = vi.value; });
+      const del = document.createElement('button'); del.className = 'kv-del'; del.textContent = '×';
+      del.addEventListener('click', () => { arr.splice(i,1); renderRows(); });
+      r.append(ki, vi, del); list.appendChild(r);
+    });
+    const addBtn = document.createElement('button'); addBtn.className = 'add-row-btn'; addBtn.textContent = '+ Add ' + title.toLowerCase().replace(/s$/,'');
+    addBtn.addEventListener('click', () => { arr.push({k:'',v:''}); renderRows(); });
+    list.appendChild(addBtn);
+  };
+  renderRows();
+  wrap.append(l, list); configBody.appendChild(wrap);
+}
+
+function showResponsePreview(resp) {
+  const wrap = document.createElement('div'); wrap.className = 'field';
+  const l = document.createElement('label'); l.textContent = 'Last response';
+  const meta = document.createElement('div'); meta.className = 'res-meta';
+  const st = document.createElement('span'); st.className = `res-status ${resp.status < 400 ? 'ok' : 'err'}`; st.textContent = resp.status;
+  const tm = document.createElement('span'); tm.className = 'res-time'; tm.textContent = resp.ms + 'ms';
+  meta.append(st, tm);
+  const pre = document.createElement('div'); pre.className = 'res-preview'; pre.textContent = resp.body?.slice(0,600) || '(empty)';
+  wrap.append(l, meta, pre); configBody.appendChild(wrap);
 }
 
 document.getElementById('config-close').addEventListener('click', deselect);
 document.getElementById('config-delete').addEventListener('click', () => {
   if (!selected) return;
-  const id = selected;
-  deselect();
+  const id = selected; deselect();
   nodes = nodes.filter(n => n.id !== id);
   edges = edges.filter(e => e.from !== id && e.to !== id);
   document.getElementById('node-' + id)?.remove();
-  redrawEdges();
-  showEmptyHint();
+  redrawEdges(); showEmpty();
 });
 
-// ─── Execution ────────────────────────────────────────────────────────────────
+// ─── Run ────────────────────────────────────────────────────────────────────
 btnRun.addEventListener('click', runFlow);
 
 async function runFlow() {
   if (running) return;
-  running = true;
-  btnRun.disabled = true;
-  btnRun.textContent = '⏳ Running';
-  nodes.forEach(n => setNodeStatus(n.id, ''));
-  addLog(null, '── Workflow started ──', 'info');
-
-  const triggers = nodes.filter(n => n.type === 'trigger');
-  if (!triggers.length) {
-    addLog(null, 'No Trigger node found', 'error');
-    done(); return;
-  }
+  running = true; btnRun.disabled = true; btnRun.textContent = '⏳ Running';
+  nodes.forEach(n => chip(n.id, 'idle', 'idle'));
+  lg(null, '── Run started ──', 'info');
 
   const order = topoSort();
-  if (!order) { addLog(null, 'Cycle detected', 'error'); done(); return; }
+  if (!order) { lg(null, 'Cycle detected', 'err'); finish(); return; }
 
-  const outputs = {};
+  const outputs = {};  // nodeId → string
+  const nodeCtx  = {};  // nodeId → { status, headers, body } for HTTP nodes
 
   for (const nodeId of order) {
     const node = nodes.find(n => n.id === nodeId);
     if (!node) continue;
-    setNodeStatus(nodeId, 'running');
-    const upstream = edges.filter(e => e.to === nodeId).map(e => outputs[e.from] ?? '').filter(Boolean).join('\n');
+    chip(nodeId, 'run', 'running');
+    const upEdges = edges.filter(e => e.to === nodeId);
+    const input = upEdges.map(e => outputs[e.from] ?? '').filter(Boolean).join('\n');
+    // inherit http context from direct upstream request node
+    const upReq = upEdges.map(e => nodeCtx[e.from]).find(Boolean);
 
     try {
-      const result = await execNode(node, upstream);
-      if (result === null) {
-        // Condition blocked — skip downstream
-        setNodeStatus(nodeId, 'done');
-        addLog(nodeId, '(condition not met — skipped)', 'info');
-        // Mark downstream as skipped by not writing to outputs
-        continue;
-      }
-      outputs[nodeId] = result;
-      setNodeStatus(nodeId, 'done');
-      const preview = String(result).slice(0, 240) + (String(result).length > 240 ? '…' : '');
-      addLog(nodeId, preview, 'success');
+      const res = await execNode(node, input, upReq, outputs);
+      if (res === null) { chip(nodeId, 'ok', 'skipped'); lg(nodeId, '(condition not met — skipped)', 'info'); continue; }
+      outputs[nodeId] = res.text ?? res;
+      if (res.httpCtx) nodeCtx[nodeId] = res.httpCtx;
+      chip(nodeId, 'ok', res.httpCtx ? res.httpCtx.status : 'ok');
+      lg(nodeId, String(res.text ?? res).slice(0, 300), 'ok');
     } catch (err) {
-      setNodeStatus(nodeId, 'error');
-      addLog(nodeId, err.message, 'error');
+      chip(nodeId, 'err', 'error');
+      lg(nodeId, err.message, 'err');
       outputs[nodeId] = '';
     }
   }
 
-  done();
+  finish();
 }
 
-function done() {
-  running = false;
-  btnRun.disabled = false;
-  btnRun.textContent = '▶ Run';
-  addLog(null, '── Workflow finished ──', 'info');
-}
+function finish() { running = false; btnRun.disabled = false; btnRun.textContent = '▶ Run'; lg(null, '── Run complete ──', 'info'); }
 
-async function execNode(node, input) {
+async function execNode(node, input, upCtx, outputs) {
+  const c = node.config;
+  const val = s => resolveVars(s).replace(/\{\{input\}\}/g, input);
+
   switch (node.type) {
 
     case 'trigger':
-      return node.config.prompt;
+      return { text: c.input ? val(c.input) : '(triggered)' };
+
+    case 'auth':
+      // Auth node just passes through — it's picked up by downstream request node
+      return { text: input };
+
+    case 'request': {
+      // Check if upstream auth node exists
+      const upAuthEdge = edges.filter(e => e.to === node.id).find(e => nodes.find(n => n.id === e.from)?.type === 'auth');
+      const authNode = upAuthEdge ? nodes.find(n => n.id === upAuthEdge.from) : null;
+      const ac = authNode?.config;
+
+      const headers = {};
+      (c.headers || []).forEach(h => { if (h.k) headers[val(h.k)] = val(h.v); });
+
+      // Auth
+      if (ac || c.auth_type !== 'none') {
+        const atype = ac ? ac.type : c.auth_type;
+        const aval  = ac ? ac.value : c.auth_value;
+        if (atype === 'bearer') headers['Authorization'] = `Bearer ${val(aval)}`;
+        if (atype === 'basic')  headers['Authorization'] = `Basic ${btoa(val(aval))}`;
+        if (atype === 'api_key') headers[c.auth_key || 'X-API-Key'] = val(aval);
+      }
+
+      const method = c.method || 'GET';
+      const url = val(c.url);
+      if (!url) throw new Error('No URL set');
+
+      const opts = { method, headers };
+      if (['POST','PUT','PATCH'].includes(method) && c.body) {
+        if (!headers['Content-Type']) headers['Content-Type'] = 'application/json';
+        opts.body = val(c.body).replace(/\{\{input\}\}/g, input);
+      }
+
+      const t0 = Date.now();
+      lg(node.id, `${method} ${url}`, 'info');
+      const res = await fetch(url, opts);
+      const ms = Date.now() - t0;
+      const text = await res.text();
+      let body = text;
+      try { body = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+
+      const respHeaders = {};
+      res.headers.forEach((v,k) => respHeaders[k] = v);
+      const httpCtx = { status: res.status, headers: respHeaders, body, ms };
+      nodeResponses[node.id] = httpCtx;
+      if (selected === node.id) openConfig(node.id);
+
+      lg(node.id, `${res.status} ${res.statusText} — ${ms}ms — ${body.length}b`, res.ok ? 'ok' : 'err');
+      return { text: body, httpCtx };
+    }
+
+    case 'paginate': {
+      const reqEdge = edges.filter(e => e.to === node.id).find(e => nodes.find(n => n.id === e.from)?.type === 'request');
+      if (!reqEdge) throw new Error('Paginate needs an HTTP Request upstream');
+      const reqNode = nodes.find(n => n.id === reqEdge.from);
+      const results = [];
+      for (let pg = (c.start ?? 1); pg < (c.start ?? 1) + (c.max_pages ?? 5); pg++) {
+        const paramChar = reqNode.config.url.includes('?') ? '&' : '?';
+        const pageUrl = val(reqNode.config.url) + paramChar + (c.page_param || 'page') + '=' + pg;
+        lg(node.id, `Page ${pg}: GET ${pageUrl}`, 'info');
+        const r = await fetch(pageUrl, { method: 'GET' });
+        const t = await r.text();
+        let parsed; try { parsed = JSON.parse(t); } catch { parsed = t; }
+        if (Array.isArray(parsed)) { results.push(...parsed); if (parsed.length === 0) break; }
+        else { results.push(parsed); break; }
+      }
+      return { text: JSON.stringify(results, null, 2) };
+    }
+
+    case 'extract': {
+      if (!c.path) return { text: input };
+      let obj; try { obj = JSON.parse(input); } catch { throw new Error('Upstream is not valid JSON'); }
+      const result = getPath(obj, c.path);
+      const out = typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result ?? '');
+      if (c.save_as) setVar(c.save_as, out);
+      return { text: out };
+    }
+
+    case 'transform': {
+      const tmpl = c.template;
+      let out = val(tmpl);
+      if (tmpl.trim().startsWith('return ') || tmpl.trim().startsWith('const ') || tmpl.trim().startsWith('let ')) {
+        try { out = String(new Function('input', 'vars', tmpl)(input, vars)); } catch(e) { throw new Error('JS error: ' + e.message); }
+      }
+      return { text: out };
+    }
+
+    case 'set_var': {
+      if (!c.name) throw new Error('No variable name set');
+      const v = val(c.value);
+      setVar(c.name, v);
+      return { text: input }; // pass through
+    }
+
+    case 'condition': {
+      let check;
+      if (c.field === 'status') check = String(upCtx?.status ?? '');
+      else if (c.field === 'header') check = String(upCtx?.headers?.[c.header_name?.toLowerCase()] ?? '');
+      else check = input;
+
+      const cv = val(c.val);
+      const met = (() => {
+        switch (c.op) {
+          case 'eq':          return check === cv;
+          case 'neq':         return check !== cv;
+          case 'gt':          return Number(check) > Number(cv);
+          case 'lt':          return Number(check) < Number(cv);
+          case 'contains':    return check.includes(cv);
+          case 'starts_with': return check.startsWith(cv);
+          default: return true;
+        }
+      })();
+      return met ? { text: input } : null;
+    }
 
     case 'ai': {
-      const prompt = node.config.prompt.replace(/\{\{input\}\}/g, input);
+      const prompt = val(c.prompt).replace(/\{\{input\}\}/g, input);
       const msgs = [];
-      if (node.config.system) msgs.push({ role: 'system', content: node.config.system });
+      if (c.system) msgs.push({ role: 'system', content: c.system });
       msgs.push({ role: 'user', content: prompt });
       const res = await fetch('https://text.pollinations.ai/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'openai-fast', messages: msgs, stream: false, referrer: REFERRER }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().then(t=>t.slice(0,100))}`);
+      if (!res.ok) throw new Error(`Pollinations ${res.status}`);
       const data = await res.json();
-      return data.choices?.[0]?.message?.content ?? 'No response';
-    }
-
-    case 'http': {
-      const opts = { method: node.config.method };
-      if (node.config.body && node.config.method !== 'GET') {
-        opts.headers = { 'Content-Type': 'application/json' };
-        opts.body = node.config.body.replace(/\{\{input\}\}/g, input);
-      }
-      const res = await fetch(node.config.url, opts);
-      const txt = await res.text();
-      try { return JSON.stringify(JSON.parse(txt), null, 2); }
-      catch { return txt; }
-    }
-
-    case 'transform': {
-      const tmpl = node.config.template;
-      let out = tmpl.replace(/\{\{input\}\}/g, input);
-      if (tmpl.includes('return ') || tmpl.trim().startsWith('(')) {
-        try { out = String(new Function('input', tmpl)(input)); } catch {}
-      }
-      return out;
-    }
-
-    case 'condition': {
-      const kw = node.config.contains.trim().toLowerCase();
-      if (!kw) return input;
-      return input.toLowerCase().includes(kw) ? input : null;
+      return { text: data.choices?.[0]?.message?.content ?? 'No response' };
     }
 
     case 'output':
-      return input;
-
-    default:
-      return input;
+      return { text: input };
   }
 }
 
+// ─── JSON path helper ────────────────────────────────────────────────────────
+function getPath(obj, path) {
+  const parts = path.replace(/\[(\d+)\]/g, '.$1').replace(/\[\*\]/g, '.*').split('.');
+  let cur = obj;
+  for (const part of parts) {
+    if (cur === null || cur === undefined) return undefined;
+    if (part === '*') {
+      return Array.isArray(cur) ? cur : Object.values(cur);
+    }
+    cur = cur[part];
+  }
+  return cur;
+}
+
+// ─── Topo sort ───────────────────────────────────────────────────────────────
 function topoSort() {
   const visited = new Set(), stack = [], visiting = new Set();
   function visit(id) {
@@ -847,64 +1028,50 @@ function topoSort() {
     if (visited.has(id)) return true;
     visiting.add(id);
     for (const e of edges) if (e.from === id) if (!visit(e.to)) return false;
-    visiting.delete(id);
-    visited.add(id);
-    stack.unshift(id);
+    visiting.delete(id); visited.add(id); stack.unshift(id);
     return true;
   }
   for (const n of nodes) if (!visit(n.id)) return null;
   return stack;
 }
 
-// ─── Toolbar ──────────────────────────────────────────────────────────────────
+// ─── Utility ─────────────────────────────────────────────────────────────────
+function showEmpty() { emptyHint.style.display = nodes.length === 0 ? '' : 'none'; }
+
 document.getElementById('btn-clear').addEventListener('click', () => {
-  if (!confirm('Clear the canvas?')) return;
-  nodes = []; edges = [];
-  canvasNodes.innerHTML = '';
-  canvasNodes.appendChild(emptyHint);
-  emptyHint.style.display = '';
-  edgesG.innerHTML = '';
-  deselect();
-  cancelConnect();
-  idSeq = 1;
+  if (!confirm('Clear canvas?')) return;
+  nodes = []; edges = []; vars = {}; Object.keys(nodeResponses).forEach(k => delete nodeResponses[k]);
+  canvasNodes.innerHTML = ''; canvasNodes.appendChild(emptyHint);
+  emptyHint.style.display = ''; edgesG.innerHTML = '';
+  deselect(); cancelConn(); idSeq = 1; renderVars();
 });
 
 document.getElementById('btn-save').addEventListener('click', () => {
-  localStorage.setItem('flow-v1', JSON.stringify({ nodes, edges, idSeq }));
-  addLog(null, 'Saved', 'info');
+  localStorage.setItem('flow-v2', JSON.stringify({ nodes, edges, vars, idSeq }));
+  lg(null, 'Saved', 'info');
 });
 
 document.getElementById('btn-load').addEventListener('click', () => {
-  const raw = localStorage.getItem('flow-v1');
-  if (!raw) { addLog(null, 'Nothing saved yet', 'error'); return; }
+  const raw = localStorage.getItem('flow-v2');
+  if (!raw) { lg(null, 'Nothing saved', 'err'); return; }
   const s = JSON.parse(raw);
-  nodes = []; edges = s.edges; idSeq = s.idSeq;
-  canvasNodes.innerHTML = '';
-  canvasNodes.appendChild(emptyHint);
-  emptyHint.style.display = 'none';
-  edgesG.innerHTML = '';
+  nodes = []; edges = s.edges; vars = s.vars || {}; idSeq = s.idSeq;
+  canvasNodes.innerHTML = ''; canvasNodes.appendChild(emptyHint);
+  emptyHint.style.display = 'none'; edgesG.innerHTML = '';
   s.nodes.forEach(n => { nodes.push(n); mountNode(n); });
-  redrawEdges();
-  addLog(null, 'Loaded', 'info');
+  redrawEdges(); renderVars(); lg(null, 'Loaded', 'info');
 });
 
 document.getElementById('log-clear').addEventListener('click', () => { logEl.innerHTML = ''; });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { cancelConnect(); deselect(); }
-  if ((e.key === 'Delete' || e.key === 'Backspace') && selected && document.activeElement === document.body) {
-    document.getElementById('config-delete').click();
-  }
+  if (e.key === 'Escape') { cancelConn(); deselect(); }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selected && document.activeElement === document.body) document.getElementById('config-delete').click();
 });
 
-function showEmptyHint() {
-  emptyHint.style.display = nodes.length === 0 ? '' : 'none';
-}
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-showEmptyHint();
-addLog(null, 'Flow ready — drag nodes to start', 'info');
+showEmpty();
+lg(null, 'Flow ready — drag an HTTP Request node to start', 'info');
 </script>
 </body>
 </html>
-<!-- v2.0 flow -->
+<!-- v3.0 http-automation -->
