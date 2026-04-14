@@ -7,9 +7,16 @@ import { redrawEdges } from './canvas/edges';
 import { addLog } from './ui/log';
 import { renderVars } from './ui/vars';
 import { updateHeaderBadge } from './ui/header';
-import { openConfig, resetConfigTab } from './ui/config';
+import { resetConfigTab } from './ui/config';
 import { initSidebarSearch } from './ui/search';
 import type { FlowNode, Edge } from './types';
+
+interface SaveData {
+  nodes: FlowNode[];
+  edges: Edge[];
+  vars: Record<string, string>;
+  idSeq: number;
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -58,13 +65,6 @@ document.getElementById('btn-save')?.addEventListener('click', () => {
 document.getElementById('btn-load')?.addEventListener('click', () => {
   const raw = localStorage.getItem('flow-v2');
   if (!raw) { addLog(null, 'Nothing saved', 'err'); return; }
-
-  interface SaveData {
-    nodes: FlowNode[];
-    edges: Edge[];
-    vars: Record<string, string>;
-    idSeq: number;
-  }
 
   const s = JSON.parse(raw) as SaveData;
 
@@ -172,5 +172,3 @@ showEmpty();
 addLog(null, 'Flow ready — drag an HTTP Request node to start', 'info');
 updateHeaderBadge();
 
-// Export openConfig so executor can call it
-export { openConfig };

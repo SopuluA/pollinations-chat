@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flow — HTTP Automation</title>
   <link rel="stylesheet" href="/src/style.css">
-  <style>PLACEHOLDER_REMOVE
+  <style type="text/x-disabled">
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0d0d0d;
@@ -290,61 +290,67 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sb-section">
-      <div class="sb-title">Get Data</div>
-      <div class="palette-item" draggable="true" data-type="trigger">
-        <span class="p-icon">⚡</span>
-        <div class="p-info"><div class="p-name">Start</div><div class="p-desc">kick it off</div></div>
+      <div class="sb-search-wrap">
+        <input class="sb-search" id="sb-search" type="text" placeholder="Search nodes…" autocomplete="off">
       </div>
-      <div class="palette-item" draggable="true" data-type="request">
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title" data-group="http">HTTP</div>
+      <div class="palette-item" draggable="true" data-type="request" data-group="http">
         <span class="p-icon">🌐</span>
-        <div class="p-info"><div class="p-name">Fetch URL</div><div class="p-desc">grab data</div></div>
+        <div class="p-info"><div class="p-name">HTTP Request</div><div class="p-desc">GET, POST, PUT, DELETE…</div></div>
       </div>
-      <div class="palette-item" draggable="true" data-type="paginate">
-        <span class="p-icon">📄</span>
-        <div class="p-info"><div class="p-name">Loop Pages</div><div class="p-desc">all pages</div></div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-    <div class="sb-section">
-      <div class="sb-title">Process</div>
-      <div class="palette-item" draggable="true" data-type="extract">
-        <span class="p-icon">🔍</span>
-        <div class="p-info"><div class="p-name">Pick Field</div><div class="p-desc">grab a value</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="transform">
-        <span class="p-icon">⚙</span>
-        <div class="p-info"><div class="p-name">Reshape</div><div class="p-desc">reshape it</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="set_var">
-        <span class="p-icon">📌</span>
-        <div class="p-info"><div class="p-name">Save Value</div><div class="p-desc">remember it</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="condition">
-        <span class="p-icon">🔀</span>
-        <div class="p-info"><div class="p-name">Filter</div><div class="p-desc">filter by value</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="ai">
-        <span class="p-icon">🤖</span>
-        <div class="p-info"><div class="p-name">AI</div><div class="p-desc">summarize it</div></div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-    <div class="sb-section">
-      <div class="sb-title">Output</div>
-      <div class="palette-item" draggable="true" data-type="output">
-        <span class="p-icon">📤</span>
-        <div class="p-info"><div class="p-name">Show Result</div><div class="p-desc">display it</div></div>
-      </div>
-      <div class="palette-item" draggable="true" data-type="auth">
+      <div class="palette-item" draggable="true" data-type="auth" data-group="http">
         <span class="p-icon">🔑</span>
-        <div class="p-info"><div class="p-name">Add Auth</div><div class="p-desc">token or key</div></div>
+        <div class="p-info"><div class="p-name">Auth</div><div class="p-desc">Bearer / API key / Basic</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="paginate" data-group="http">
+        <span class="p-icon">📄</span>
+        <div class="p-info"><div class="p-name">Paginate</div><div class="p-desc">Loop through pages</div></div>
       </div>
     </div>
 
     <div class="divider"></div>
-    <div class="sb-section" style="margin-top:auto">
+    <div class="sb-section">
+      <div class="sb-title" data-group="data">Data</div>
+      <div class="palette-item" draggable="true" data-type="trigger" data-group="data">
+        <span class="p-icon">⚡</span>
+        <div class="p-info"><div class="p-name">Trigger</div><div class="p-desc">Manual start / input</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="extract" data-group="data">
+        <span class="p-icon">🔍</span>
+        <div class="p-info"><div class="p-name">Extract</div><div class="p-desc">Pick JSON field by path</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="transform" data-group="data">
+        <span class="p-icon">⚙</span>
+        <div class="p-info"><div class="p-name">Transform</div><div class="p-desc">Template / JS reshape</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="set_var" data-group="data">
+        <span class="p-icon">📌</span>
+        <div class="p-info"><div class="p-name">Set Variable</div><div class="p-desc">Store for reuse</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="condition" data-group="data">
+        <span class="p-icon">🔀</span>
+        <div class="p-info"><div class="p-name">Condition</div><div class="p-desc">Branch on value / status</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sb-section">
+      <div class="sb-title" data-group="output">Output</div>
+      <div class="palette-item" draggable="true" data-type="ai" data-group="output">
+        <span class="p-icon">🤖</span>
+        <div class="p-info"><div class="p-name">AI Process</div><div class="p-desc">Summarize / analyze</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="output" data-group="output">
+        <span class="p-icon">📤</span>
+        <div class="p-info"><div class="p-name">Output</div><div class="p-desc">Display final result</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sb-section sb-vars">
       <div class="sb-title">Variables</div>
       <div class="var-list" id="var-list">
         <div class="var-empty">No variables set yet.</div>
@@ -365,11 +371,16 @@
     </svg>
     <div class="canvas-nodes" id="canvas-nodes">
       <div class="empty-hint" id="empty-hint">
-        <h2>Drag a node to start</h2>
-        <p>Pick <strong>Start</strong> or <strong>Fetch URL</strong> from the sidebar,<br>
-        drop it here, connect nodes, hit <strong>Run</strong>.</p>
+        <div class="empty-drop-zone">
+          <div class="empty-icon">⬇</div>
+          <h2>Drop nodes to start</h2>
+          <p>Drag an <strong>HTTP Request</strong> or <strong>Trigger</strong> node<br>
+          onto the canvas, wire nodes together, hit <strong>Run</strong>.</p>
+          <p class="empty-hint-keys">Cmd+Enter to run &nbsp;·&nbsp; Esc to deselect</p>
+        </div>
       </div>
     </div>
+    <canvas id="minimap" class="minimap" width="160" height="100"></canvas>
   </div>
 
   <!-- Config panel -->
@@ -378,6 +389,7 @@
       <span id="config-title" class="config-header-title">Configure</span>
       <button class="icon-btn" id="config-close">✕</button>
     </div>
+    <div class="tab-row" id="config-tabs"></div>
     <div class="config-scroll">
       <div class="config-body" id="config-body"></div>
     </div>
@@ -398,7 +410,7 @@
   <div id="log"></div>
 </div>
 
-<script>
+<script type="text/x-disabled">
 const REFERRER = 'pollinations-chat-kohl.vercel.app';
 
 // ─── State ──────────────────────────────────────────────────────────────────
@@ -1069,6 +1081,7 @@ document.addEventListener('keydown', e => {
 showEmpty();
 lg(null, 'Ready — drag a node from the sidebar to start', 'info');
 </script>
+
+<script type="module" src="/src/main.ts"></script>
 </body>
 </html>
-<!-- v3.0 http-automation -->

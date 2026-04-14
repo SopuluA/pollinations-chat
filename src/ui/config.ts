@@ -1,4 +1,4 @@
-import { nodes, nodeResponses, selected } from '../state';
+import { nodes, nodeResponses } from '../state';
 import { NODE_DEF } from '../nodes/registry';
 import { refreshBody } from '../canvas/node-element';
 import type { FlowNode, KVPair } from '../types';
@@ -343,5 +343,3 @@ export function resetConfigTab(): void {
   currentTab = 'request';
 }
 
-// Re-export openConfig for use in executor (to refresh after request runs)
-export { selected };
