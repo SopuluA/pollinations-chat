@@ -56,7 +56,7 @@
   </footer>
 
   <script>
-    const APP_KEY = 'opcodesk_wkCupR3';
+    const REFERRER = 'pollinations-chat-kohl.vercel.app';
     const chat = document.getElementById('chat');
     const input = document.getElementById('input');
     const send = document.getElementById('send');
@@ -81,14 +81,12 @@
       try {
         const res = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${APP_KEY}`,
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: modelSel.value,
             messages: history,
             stream: false,
+            referrer: REFERRER,
           }),
         });
         const data = await res.json();
