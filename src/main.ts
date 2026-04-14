@@ -167,6 +167,53 @@ if (configPanel) {
   observer.observe(configPanel, { attributes: true, attributeFilter: ['class'] });
 }
 
+// ── Export / Import ───────────────────────────────────────────────────────────
+
+document.getElementById('btn-export')?.addEventListener('click', () => {
+  const data = JSON.stringify({ nodes, edges, vars, version: 2 }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flow-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  addLog(null, 'Workflow exported', 'info');
+});
+
+// Double-click Export button → open import dialog
+document.getElementById('btn-export')?.addEventListener('dblclick', () => {
+  document.getElementById('import-file')?.click();
+});
+
+document.getElementById('import-file')?.addEventListener('change', e => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const s = JSON.parse(ev.target?.result as string) as SaveData;
+      document.querySelectorAll<HTMLElement>('.node').forEach(el => el.remove());
+      resetState();
+      const edgesG = document.getElementById('edges-g');
+      if (edgesG) edgesG.innerHTML = '';
+
+      edges.push(...s.edges);
+      for (const [k, v] of Object.entries(s.vars ?? {})) vars[k] = v;
+      setIdSeq(s.idSeq ?? 1);
+      const hint = document.getElementById('empty-hint');
+      if (hint) hint.style.display = 'none';
+      s.nodes.forEach(n => { nodes.push(n); mountNode(n); });
+      redrawEdges(); renderVars(); updateHeaderBadge();
+      addLog(null, `Imported: ${file.name}`, 'info');
+    } catch {
+      addLog(null, 'Invalid workflow file', 'err');
+    }
+    (e.target as HTMLInputElement).value = '';
+  };
+  reader.readAsText(file);
+});
+
 // ── Templates ─────────────────────────────────────────────────────────────────
 
 document.getElementById('btn-templates')?.addEventListener('click', () => {
