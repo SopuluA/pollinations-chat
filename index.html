@@ -3,115 +3,908 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jarvis Chat — powered by Pollinations</title>
+  <title>Flow — Agentic Automation</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0d0d0d;
       --surface: #161616;
-      --border: #252525;
-      --accent: #7c6af7;
+      --surface2: #1e1e1e;
+      --border: #2a2a2a;
       --text: #e8e8e8;
-      --muted: #555;
+      --muted: #666;
+      --accent: #7c6af7;
     }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; height: 100dvh; display: flex; flex-direction: column; }
-    header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-    header h1 { font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
-    header .dot { width: 8px; height: 8px; border-radius: 50%; background: #4caf50; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .model-select { margin-left: auto; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
-    #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-    .msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 0.9rem; white-space: pre-wrap; word-break: break-word; }
-    .msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-    .msg.ai { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-    .msg.ai.thinking { color: var(--muted); font-style: italic; }
-    footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
-    #input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; resize: none; outline: none; font-family: inherit; }
-    #input:focus { border-color: var(--accent); }
-    #send { background: var(--accent); color: #fff; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: opacity 0.15s; }
-    #send:disabled { opacity: 0.4; cursor: not-allowed; }
-    #send:hover:not(:disabled) { opacity: 0.85; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    header {
+      height: 48px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 0.95rem; font-weight: 800; letter-spacing: 2px; }
+    .badge { font-size: 0.62rem; padding: 2px 7px; background: var(--accent); border-radius: 4px; opacity: 0.85; font-weight: 600; letter-spacing: 0.5px; }
+    .spacer { flex: 1; }
+    .btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.8; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* MAIN LAYOUT */
+    .main { flex: 1; display: flex; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 196px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sidebar-section { padding: 14px 12px; }
+    .sidebar-title {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .palette-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      margin-bottom: 6px;
+      cursor: grab;
+      font-size: 0.82rem;
+      user-select: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .palette-item:hover { border-color: var(--accent); background: #1a1a2a; }
+    .palette-item:active { cursor: grabbing; }
+    .palette-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .palette-desc { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+
+    /* CANVAS */
+    .canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, #222 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+    #canvas-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .canvas-nodes {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2;
+    }
+
+    /* NODES */
+    .node {
+      position: absolute;
+      width: 188px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: move;
+      user-select: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .node:hover { border-color: #3a3a3a; }
+    .node.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
+    .node-header {
+      padding: 9px 12px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    .node-icon { font-size: 0.88rem; }
+    .node-body {
+      padding: 8px 12px;
+      font-size: 0.73rem;
+      color: var(--muted);
+      min-height: 30px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    /* PORTS */
+    .port {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid #3a3a3a;
+      background: var(--surface2);
+      position: absolute;
+      cursor: crosshair;
+      z-index: 10;
+      transition: border-color 0.15s, transform 0.15s, background 0.15s;
+    }
+    .port-in  { top: -8px;    left: 50%; transform: translateX(-50%); }
+    .port-out { bottom: -8px; left: 50%; transform: translateX(-50%); }
+    .port-in:hover  { border-color: #22c55e; background: #22c55e33; transform: translateX(-50%) scale(1.3); }
+    .port-out:hover { border-color: var(--accent); background: #7c6af733; transform: translateX(-50%) scale(1.3); }
+    .port.hot { border-color: var(--accent); background: var(--accent); }
+
+    /* NODE STATUS DOT */
+    .node-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #333;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .node-status-dot.running { background: #f59e0b; animation: blink .6s infinite; }
+    .node-status-dot.done    { background: #22c55e; }
+    .node-status-dot.error   { background: #ef4444; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* CONFIG PANEL */
+    .config-panel {
+      width: 268px;
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .config-panel.hidden { display: none; }
+    .config-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .config-close { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; line-height: 1; }
+    .config-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+    .field input, .field textarea, .field select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      width: 100%;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
+    .field textarea { min-height: 60px; }
+    .hint-text { font-size: 0.71rem; color: var(--muted); line-height: 1.5; }
+    .delete-btn {
+      margin: 0 16px 14px;
+      padding: 8px;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      background: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.15s;
+    }
+    .delete-btn:hover { background: rgba(239,68,68,0.1); }
+
+    /* LOG PANEL */
+    .log-panel {
+      height: 148px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .log-header {
+      padding: 5px 14px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .log-clear { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.72rem; }
+    #log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 14px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.73rem;
+      line-height: 1.65;
+    }
+    .log-entry { display: flex; gap: 8px; }
+    .log-time { color: #444; flex-shrink: 0; }
+    .log-node { color: var(--accent); flex-shrink: 0; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .log-msg { word-break: break-all; }
+    .log-msg.error   { color: #ef4444; }
+    .log-msg.success { color: #22c55e; }
+    .log-msg.info    { color: var(--muted); }
+
+    /* EDGES */
+    .edge { stroke: #383838; stroke-width: 1.8; fill: none; cursor: pointer; pointer-events: stroke; transition: stroke 0.15s; }
+    .edge:hover { stroke: #ef4444; stroke-width: 2.5; }
+    #connecting-line { stroke: var(--accent); stroke-width: 1.8; fill: none; stroke-dasharray: 5,3; display: none; pointer-events: none; }
+
+    /* EMPTY HINT */
+    .empty-hint {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .empty-hint h2 { font-size: 1.05rem; margin-bottom: 6px; font-weight: 600; }
+    .empty-hint p { font-size: 0.78rem; line-height: 1.6; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="dot"></div>
-    <h1>Jarvis Chat</h1>
-    <select class="model-select" id="model">
-      <option value="openai-fast">GPT-OSS Fast (free)</option>
-    </select>
-  </header>
-  <div id="chat">
-    <div class="msg ai">Hey, I'm Jarvis. What do you need?</div>
+
+<header>
+  <h1>FLOW</h1>
+  <span class="badge">agentic</span>
+  <div class="spacer"></div>
+  <button class="btn btn-ghost" id="btn-clear">Clear</button>
+  <button class="btn btn-ghost" id="btn-save">Save</button>
+  <button class="btn btn-ghost" id="btn-load">Load</button>
+  <button class="btn btn-primary" id="btn-run">&#9654; Run</button>
+</header>
+
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Nodes</div>
+
+      <div class="palette-item" draggable="true" data-type="trigger">
+        <div class="palette-dot" style="background:#22c55e"></div>
+        <div><div>Trigger</div><div class="palette-desc">Start the flow</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="ai">
+        <div class="palette-dot" style="background:#a855f7"></div>
+        <div><div>AI Agent</div><div class="palette-desc">Pollinations LLM</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="http">
+        <div class="palette-dot" style="background:#3b82f6"></div>
+        <div><div>HTTP Request</div><div class="palette-desc">Fetch any URL</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="transform">
+        <div class="palette-dot" style="background:#f97316"></div>
+        <div><div>Transform</div><div class="palette-desc">Reshape data</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="condition">
+        <div class="palette-dot" style="background:#eab308"></div>
+        <div><div>Condition</div><div class="palette-desc">Branch on value</div></div>
+      </div>
+      <div class="palette-item" draggable="true" data-type="output">
+        <div class="palette-dot" style="background:#6b7280"></div>
+        <div><div>Output</div><div class="palette-desc">Display result</div></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="border-top:1px solid var(--border); margin-top: auto;">
+      <div class="sidebar-title">Usage</div>
+      <p class="hint-text">
+        Drag nodes to canvas.<br>
+        Click <b style="color:var(--text)">&#9679;</b> output port, then an input port to connect.<br>
+        Click an edge to delete it.<br>
+        <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 4px;border-radius:3px;font-size:0.68rem;">Del</kbd> removes selected node.
+      </p>
+    </div>
   </div>
-  <footer>
-    <textarea id="input" rows="1" placeholder="Ask anything..." maxlength="4000"></textarea>
-    <button id="send">Send</button>
-  </footer>
 
-  <script>
-    const REFERRER = 'pollinations-chat-kohl.vercel.app';
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('input');
-    const send = document.getElementById('send');
-    const modelSel = document.getElementById('model');
-    const history = [{ role: 'system', content: 'You are Jarvis, a sharp and helpful AI assistant. Be concise.' }];
+  <!-- Canvas -->
+  <div class="canvas-wrap" id="canvas">
+    <svg id="canvas-svg">
+      <defs>
+        <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0 L0,7 L7,3.5 z" fill="#383838"/>
+        </marker>
+        <marker id="arr-hot" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0 L0,7 L7,3.5 z" fill="#7c6af7"/>
+        </marker>
+      </defs>
+      <g id="edges-g"></g>
+      <path id="connecting-line" d=""/>
+    </svg>
+    <div class="canvas-nodes" id="canvas-nodes">
+      <div class="empty-hint" id="empty-hint">
+        <h2>Build a workflow</h2>
+        <p>Drag a <strong>Trigger</strong> node onto the canvas<br>then chain AI agents, transforms, and outputs.</p>
+      </div>
+    </div>
+  </div>
 
-    function addMsg(role, text) {
-      const div = document.createElement('div');
-      div.className = `msg ${role === 'user' ? 'user' : 'ai'}`;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-      return div;
-    }
+  <!-- Config panel -->
+  <div class="config-panel hidden" id="config-panel">
+    <div class="config-header">
+      <span id="config-title">Configure</span>
+      <button class="config-close" id="config-close">&#10005;</button>
+    </div>
+    <div class="config-body" id="config-body"></div>
+    <button class="delete-btn" id="config-delete">Delete node</button>
+  </div>
+</div>
 
-    async function ask(text) {
-      history.push({ role: 'user', content: text });
-      const thinking = addMsg('ai', '...');
-      thinking.classList.add('thinking');
-      send.disabled = true;
+<!-- Log panel -->
+<div class="log-panel">
+  <div class="log-header">
+    <span>Execution Log</span>
+    <button class="log-clear" id="log-clear">Clear</button>
+  </div>
+  <div id="log"></div>
+</div>
 
-      try {
-        const res = await fetch('https://text.pollinations.ai/openai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: modelSel.value,
-            messages: history,
-            stream: false,
-            referrer: REFERRER,
-          }),
-        });
-        const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content ?? 'No response.';
-        history.push({ role: 'assistant', content: reply });
-        thinking.textContent = reply;
-        thinking.classList.remove('thinking');
-      } catch (e) {
-        thinking.textContent = 'Error: ' + e.message;
+<script>
+const REFERRER = 'pollinations-chat-kohl.vercel.app';
+
+// ─── State ──────────────────────────────────────────────────────────────────
+let nodes = [];
+let edges = [];
+let selected = null;
+let connecting = null;  // { nodeId, x, y }
+let dragging  = null;   // { nodeId, offX, offY }
+let running   = false;
+let idSeq     = 1;
+
+const NODE_DEF = {
+  trigger:   { label: 'Trigger',      icon: '⚡', color: '#22c55e', hasIn: false, hasOut: true  },
+  ai:        { label: 'AI Agent',     icon: '🤖', color: '#a855f7', hasIn: true,  hasOut: true  },
+  http:      { label: 'HTTP Request', icon: '🌐', color: '#3b82f6', hasIn: true,  hasOut: true  },
+  transform: { label: 'Transform',    icon: '⚙',  color: '#f97316', hasIn: true,  hasOut: true  },
+  condition: { label: 'Condition',    icon: '🔀', color: '#eab308', hasIn: true,  hasOut: true  },
+  output:    { label: 'Output',       icon: '📤', color: '#6b7280', hasIn: true,  hasOut: false },
+};
+
+const DEFAULTS = {
+  trigger:   { prompt: 'Hello! What can you help me with today?' },
+  ai:        { system: 'You are a helpful assistant. Be concise.', prompt: '{{input}}' },
+  http:      { url: 'https://httpbin.org/get', method: 'GET', body: '' },
+  transform: { template: '{{input}}' },
+  condition: { contains: '' },
+  output:    { label: 'Result' },
+};
+
+// ─── DOM ────────────────────────────────────────────────────────────────────
+const canvas      = document.getElementById('canvas');
+const canvasNodes = document.getElementById('canvas-nodes');
+const edgesG      = document.getElementById('edges-g');
+const connectLine = document.getElementById('connecting-line');
+const configPanel = document.getElementById('config-panel');
+const configTitle = document.getElementById('config-title');
+const configBody  = document.getElementById('config-body');
+const emptyHint   = document.getElementById('empty-hint');
+const logEl       = document.getElementById('log');
+const btnRun      = document.getElementById('btn-run');
+
+// ─── Log ────────────────────────────────────────────────────────────────────
+function addLog(nodeId, msg, type = '') {
+  const d = document.createElement('div');
+  d.className = 'log-entry';
+  const t = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const name = nodeId ? (nodes.find(n => n.id === nodeId)?.label || nodeId) : 'system';
+  d.innerHTML = `<span class="log-time">${t}</span><span class="log-node">[${name}]</span><span class="log-msg ${type}">${escHtml(String(msg))}</span>`;
+  logEl.appendChild(d);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Node rendering ──────────────────────────────────────────────────────────
+function createNode(type, x, y) {
+  const id = 'n' + (idSeq++);
+  const node = {
+    id, type,
+    x: Math.round(Math.max(0, x)),
+    y: Math.round(Math.max(0, y)),
+    label: NODE_DEF[type].label,
+    config: JSON.parse(JSON.stringify(DEFAULTS[type])),
+    status: '',
+  };
+  nodes.push(node);
+  mountNode(node);
+  showEmptyHint();
+  return node;
+}
+
+function mountNode(node) {
+  const def = NODE_DEF[node.type];
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.id = 'node-' + node.id;
+  el.style.left = node.x + 'px';
+  el.style.top  = node.y + 'px';
+
+  el.innerHTML = `
+    ${def.hasIn  ? `<div class="port port-in"  data-nid="${node.id}" data-dir="in"></div>`  : ''}
+    <div class="node-header" style="background:${def.color}16;border-bottom-color:${def.color}2a">
+      <span class="node-icon">${def.icon}</span>
+      <span class="node-label">${escHtml(node.label)}</span>
+      <div class="node-status-dot" id="nsd-${node.id}"></div>
+    </div>
+    <div class="node-body" id="nbody-${node.id}">${escHtml(nodePreview(node))}</div>
+    ${def.hasOut ? `<div class="port port-out" data-nid="${node.id}" data-dir="out"></div>` : ''}
+  `;
+
+  // Drag node
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('port')) return;
+    e.preventDefault();
+    selectNode(node.id);
+    const nr = el.getBoundingClientRect();
+    dragging = { nodeId: node.id, offX: e.clientX - nr.left, offY: e.clientY - nr.top };
+  });
+
+  // Ports
+  el.querySelectorAll('.port').forEach(p => {
+    p.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (p.dataset.dir === 'out') beginConnect(node.id, e);
+      else if (connecting && p.dataset.dir === 'in') endConnect(node.id);
+    });
+  });
+
+  canvasNodes.appendChild(el);
+}
+
+function nodePreview(node) {
+  switch (node.type) {
+    case 'trigger':   return node.config.prompt.slice(0, 70);
+    case 'ai':        return node.config.prompt.slice(0, 70);
+    case 'http':      return `${node.config.method} ${node.config.url.replace(/^https?:\/\//,'').slice(0, 44)}`;
+    case 'transform': return node.config.template.slice(0, 70);
+    case 'condition': return node.config.contains ? `contains: "${node.config.contains}"` : '(no condition)';
+    case 'output':    return node.config.label;
+    default: return '';
+  }
+}
+
+function refreshNodeBody(nodeId) {
+  const node = nodes.find(n => n.id === nodeId);
+  const el = document.getElementById('nbody-' + nodeId);
+  if (node && el) el.textContent = nodePreview(node);
+}
+
+function setNodeStatus(nodeId, s) {
+  const el = document.getElementById('nsd-' + nodeId);
+  if (el) el.className = 'node-status-dot ' + s;
+}
+
+// ─── Selection ───────────────────────────────────────────────────────────────
+function selectNode(id) {
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+  selected = id;
+  if (id) {
+    document.getElementById('node-' + id)?.classList.add('selected');
+    openConfig(id);
+  }
+}
+
+function deselect() {
+  selectNode(null);
+  configPanel.classList.add('hidden');
+}
+
+canvas.addEventListener('mousedown', e => {
+  if (e.target === canvas || e.target === canvasNodes || e.target === emptyHint || e.target.closest('.empty-hint')) {
+    deselect();
+    if (connecting) cancelConnect();
+  }
+});
+
+// ─── Mouse move / up ─────────────────────────────────────────────────────────
+document.addEventListener('mousemove', e => {
+  if (dragging) {
+    const cr = canvas.getBoundingClientRect();
+    const node = nodes.find(n => n.id === dragging.nodeId);
+    if (!node) return;
+    node.x = Math.max(0, e.clientX - cr.left - dragging.offX);
+    node.y = Math.max(0, e.clientY - cr.top  - dragging.offY);
+    const el = document.getElementById('node-' + node.id);
+    if (el) { el.style.left = node.x + 'px'; el.style.top = node.y + 'px'; }
+    redrawEdges();
+  }
+  if (connecting) {
+    const cr = canvas.getBoundingClientRect();
+    const mx = e.clientX - cr.left;
+    const my = e.clientY - cr.top;
+    connectLine.setAttribute('d', curve(connecting.x, connecting.y, mx, my));
+  }
+});
+
+document.addEventListener('mouseup', () => { dragging = null; });
+
+// ─── Connect ──────────────────────────────────────────────────────────────────
+function portCenter(nodeId, dir) {
+  const el = document.getElementById('node-' + nodeId);
+  if (!el) return { x: 0, y: 0 };
+  const port = el.querySelector('.port-' + dir);
+  if (!port) return { x: 0, y: 0 };
+  const pr = port.getBoundingClientRect();
+  const cr = canvas.getBoundingClientRect();
+  return { x: pr.left + pr.width / 2 - cr.left, y: pr.top + pr.height / 2 - cr.top };
+}
+
+function beginConnect(nodeId, e) {
+  const pos = portCenter(nodeId, 'out');
+  connecting = { nodeId, x: pos.x, y: pos.y };
+  connectLine.style.display = '';
+  connectLine.setAttribute('d', `M${pos.x},${pos.y}`);
+}
+
+function endConnect(toNodeId) {
+  if (!connecting) return;
+  const { nodeId: from } = connecting;
+  cancelConnect();
+  if (from === toNodeId) return;
+  if (edges.find(e => e.from === from && e.to === toNodeId)) return;
+  edges.push({ id: 'e' + (idSeq++), from, to: toNodeId });
+  redrawEdges();
+  addLog(null, `Connected ${nodes.find(n=>n.id===from)?.label} → ${nodes.find(n=>n.id===toNodeId)?.label}`, 'info');
+}
+
+function cancelConnect() {
+  connecting = null;
+  connectLine.style.display = 'none';
+  connectLine.setAttribute('d', '');
+}
+
+// ─── Edges ───────────────────────────────────────────────────────────────────
+function curve(x1, y1, x2, y2) {
+  const cy = (y1 + y2) / 2;
+  return `M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}`;
+}
+
+function redrawEdges() {
+  edgesG.innerHTML = '';
+  for (const edge of edges) {
+    const a = portCenter(edge.from, 'out');
+    const b = portCenter(edge.to,   'in');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('class', 'edge');
+    path.setAttribute('d', curve(a.x, a.y, b.x, b.y));
+    path.setAttribute('marker-end', 'url(#arr)');
+    path.addEventListener('click', () => { edges = edges.filter(e => e.id !== edge.id); redrawEdges(); });
+    edgesG.appendChild(path);
+  }
+}
+
+// ─── Sidebar drag-drop ────────────────────────────────────────────────────────
+let paletteDragType = null;
+document.querySelectorAll('.palette-item').forEach(item => {
+  item.addEventListener('dragstart', e => {
+    paletteDragType = item.dataset.type;
+    e.dataTransfer.effectAllowed = 'copy';
+  });
+});
+canvas.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+canvas.addEventListener('drop', e => {
+  e.preventDefault();
+  if (!paletteDragType) return;
+  const cr = canvas.getBoundingClientRect();
+  createNode(paletteDragType, e.clientX - cr.left - 94, e.clientY - cr.top - 44);
+  paletteDragType = null;
+});
+
+// ─── Config Panel ─────────────────────────────────────────────────────────────
+function openConfig(nodeId) {
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  const def = NODE_DEF[node.type];
+  configTitle.textContent = def.icon + '  ' + def.label;
+  configPanel.classList.remove('hidden');
+  configBody.innerHTML = '';
+
+  field('Label', 'text', node.label, v => {
+    node.label = v;
+    const lel = document.querySelector(`#node-${nodeId} .node-label`);
+    if (lel) lel.textContent = v;
+  });
+
+  if (node.type === 'trigger') {
+    field('Input text', 'textarea', node.config.prompt, v => { node.config.prompt = v; refreshNodeBody(nodeId); });
+  }
+  if (node.type === 'ai') {
+    field('System prompt', 'textarea', node.config.system, v => { node.config.system = v; });
+    field('User prompt ({{input}} = upstream)', 'textarea', node.config.prompt, v => { node.config.prompt = v; refreshNodeBody(nodeId); });
+  }
+  if (node.type === 'http') {
+    field('URL', 'text', node.config.url, v => { node.config.url = v; refreshNodeBody(nodeId); });
+    selectField('Method', ['GET','POST','PUT','DELETE'], node.config.method, v => { node.config.method = v; refreshNodeBody(nodeId); });
+    field('Body (JSON, for POST/PUT)', 'textarea', node.config.body, v => { node.config.body = v; });
+  }
+  if (node.type === 'transform') {
+    const hint = document.createElement('p');
+    hint.className = 'hint-text';
+    hint.textContent = 'Use {{input}} for upstream text. Or write a JS function body using `input` variable.';
+    configBody.appendChild(hint);
+    field('Template / JS', 'textarea', node.config.template, v => { node.config.template = v; refreshNodeBody(nodeId); });
+  }
+  if (node.type === 'condition') {
+    const hint = document.createElement('p');
+    hint.className = 'hint-text';
+    hint.textContent = 'If input contains this text, passes to next node. Otherwise skips.';
+    configBody.appendChild(hint);
+    field('Contains text', 'text', node.config.contains, v => { node.config.contains = v; refreshNodeBody(nodeId); });
+  }
+  if (node.type === 'output') {
+    field('Display label', 'text', node.config.label, v => { node.config.label = v; refreshNodeBody(nodeId); });
+  }
+}
+
+function field(labelText, type, val, onChange) {
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+  const lbl = document.createElement('label');
+  lbl.textContent = labelText;
+  const inp = document.createElement(type === 'textarea' ? 'textarea' : 'input');
+  if (type !== 'textarea') inp.type = type;
+  inp.value = val ?? '';
+  if (type === 'textarea') inp.rows = 3;
+  inp.addEventListener('input', () => onChange(inp.value));
+  wrap.append(lbl, inp);
+  configBody.appendChild(wrap);
+}
+
+function selectField(labelText, options, current, onChange) {
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+  const lbl = document.createElement('label');
+  lbl.textContent = labelText;
+  const sel = document.createElement('select');
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o; opt.textContent = o;
+    if (o === current) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => onChange(sel.value));
+  wrap.append(lbl, sel);
+  configBody.appendChild(wrap);
+}
+
+document.getElementById('config-close').addEventListener('click', deselect);
+document.getElementById('config-delete').addEventListener('click', () => {
+  if (!selected) return;
+  const id = selected;
+  deselect();
+  nodes = nodes.filter(n => n.id !== id);
+  edges = edges.filter(e => e.from !== id && e.to !== id);
+  document.getElementById('node-' + id)?.remove();
+  redrawEdges();
+  showEmptyHint();
+});
+
+// ─── Execution ────────────────────────────────────────────────────────────────
+btnRun.addEventListener('click', runFlow);
+
+async function runFlow() {
+  if (running) return;
+  running = true;
+  btnRun.disabled = true;
+  btnRun.textContent = '⏳ Running';
+  nodes.forEach(n => setNodeStatus(n.id, ''));
+  addLog(null, '── Workflow started ──', 'info');
+
+  const triggers = nodes.filter(n => n.type === 'trigger');
+  if (!triggers.length) {
+    addLog(null, 'No Trigger node found', 'error');
+    done(); return;
+  }
+
+  const order = topoSort();
+  if (!order) { addLog(null, 'Cycle detected', 'error'); done(); return; }
+
+  const outputs = {};
+
+  for (const nodeId of order) {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) continue;
+    setNodeStatus(nodeId, 'running');
+    const upstream = edges.filter(e => e.to === nodeId).map(e => outputs[e.from] ?? '').filter(Boolean).join('\n');
+
+    try {
+      const result = await execNode(node, upstream);
+      if (result === null) {
+        // Condition blocked — skip downstream
+        setNodeStatus(nodeId, 'done');
+        addLog(nodeId, '(condition not met — skipped)', 'info');
+        // Mark downstream as skipped by not writing to outputs
+        continue;
       }
-      send.disabled = false;
-      input.focus();
+      outputs[nodeId] = result;
+      setNodeStatus(nodeId, 'done');
+      const preview = String(result).slice(0, 240) + (String(result).length > 240 ? '…' : '');
+      addLog(nodeId, preview, 'success');
+    } catch (err) {
+      setNodeStatus(nodeId, 'error');
+      addLog(nodeId, err.message, 'error');
+      outputs[nodeId] = '';
+    }
+  }
+
+  done();
+}
+
+function done() {
+  running = false;
+  btnRun.disabled = false;
+  btnRun.textContent = '▶ Run';
+  addLog(null, '── Workflow finished ──', 'info');
+}
+
+async function execNode(node, input) {
+  switch (node.type) {
+
+    case 'trigger':
+      return node.config.prompt;
+
+    case 'ai': {
+      const prompt = node.config.prompt.replace(/\{\{input\}\}/g, input);
+      const msgs = [];
+      if (node.config.system) msgs.push({ role: 'system', content: node.config.system });
+      msgs.push({ role: 'user', content: prompt });
+      const res = await fetch('https://text.pollinations.ai/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'openai-fast', messages: msgs, stream: false, referrer: REFERRER }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().then(t=>t.slice(0,100))}`);
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content ?? 'No response';
     }
 
-    send.addEventListener('click', () => {
-      const text = input.value.trim();
-      if (!text) return;
-      addMsg('user', text);
-      input.value = '';
-      ask(text);
-    });
+    case 'http': {
+      const opts = { method: node.config.method };
+      if (node.config.body && node.config.method !== 'GET') {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body = node.config.body.replace(/\{\{input\}\}/g, input);
+      }
+      const res = await fetch(node.config.url, opts);
+      const txt = await res.text();
+      try { return JSON.stringify(JSON.parse(txt), null, 2); }
+      catch { return txt; }
+    }
 
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send.click(); }
-    });
+    case 'transform': {
+      const tmpl = node.config.template;
+      let out = tmpl.replace(/\{\{input\}\}/g, input);
+      if (tmpl.includes('return ') || tmpl.trim().startsWith('(')) {
+        try { out = String(new Function('input', tmpl)(input)); } catch {}
+      }
+      return out;
+    }
 
-    input.addEventListener('input', () => {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
-    });
-  </script>
+    case 'condition': {
+      const kw = node.config.contains.trim().toLowerCase();
+      if (!kw) return input;
+      return input.toLowerCase().includes(kw) ? input : null;
+    }
+
+    case 'output':
+      return input;
+
+    default:
+      return input;
+  }
+}
+
+function topoSort() {
+  const visited = new Set(), stack = [], visiting = new Set();
+  function visit(id) {
+    if (visiting.has(id)) return false;
+    if (visited.has(id)) return true;
+    visiting.add(id);
+    for (const e of edges) if (e.from === id) if (!visit(e.to)) return false;
+    visiting.delete(id);
+    visited.add(id);
+    stack.unshift(id);
+    return true;
+  }
+  for (const n of nodes) if (!visit(n.id)) return null;
+  return stack;
+}
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm('Clear the canvas?')) return;
+  nodes = []; edges = [];
+  canvasNodes.innerHTML = '';
+  canvasNodes.appendChild(emptyHint);
+  emptyHint.style.display = '';
+  edgesG.innerHTML = '';
+  deselect();
+  cancelConnect();
+  idSeq = 1;
+});
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  localStorage.setItem('flow-v1', JSON.stringify({ nodes, edges, idSeq }));
+  addLog(null, 'Saved', 'info');
+});
+
+document.getElementById('btn-load').addEventListener('click', () => {
+  const raw = localStorage.getItem('flow-v1');
+  if (!raw) { addLog(null, 'Nothing saved yet', 'error'); return; }
+  const s = JSON.parse(raw);
+  nodes = []; edges = s.edges; idSeq = s.idSeq;
+  canvasNodes.innerHTML = '';
+  canvasNodes.appendChild(emptyHint);
+  emptyHint.style.display = 'none';
+  edgesG.innerHTML = '';
+  s.nodes.forEach(n => { nodes.push(n); mountNode(n); });
+  redrawEdges();
+  addLog(null, 'Loaded', 'info');
+});
+
+document.getElementById('log-clear').addEventListener('click', () => { logEl.innerHTML = ''; });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { cancelConnect(); deselect(); }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selected && document.activeElement === document.body) {
+    document.getElementById('config-delete').click();
+  }
+});
+
+function showEmptyHint() {
+  emptyHint.style.display = nodes.length === 0 ? '' : 'none';
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+showEmptyHint();
+addLog(null, 'Flow ready — drag nodes to start', 'info');
+</script>
 </body>
 </html>
-<!-- v1.1 -->
+<!-- v2.0 flow -->
